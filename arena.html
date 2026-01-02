@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samurai Arcade - Evil Boss Edition</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; background: #000; }
+        .arcade-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; background: rgba(0,0,0,0.8); }
+        #bigGameCanvas { background: #050505; border: 8px solid #e63946; image-rendering: pixelated; width: 100%; max-width: 1200px; height: 80vh; box-shadow: 0 0 20px #e63946; }
+        .back-home { position: fixed; top: 20px; left: 20px; z-index: 100; }
+        .pause-btn { position: fixed; top: 20px; right: 20px; z-index: 100; background: #e63946; color: #fff; border: 2px solid #fff; padding: 10px; font-family: 'Press Start 2P'; cursor: pointer; font-size: 10px; }
+    </style>
+</head>
+<body class="arcade-mode">
+    
+    <a href="index.html" class="pixel-btn-small back-home">⬅ MENU</a>
+    <button id="pause-btn" class="pause-btn">PAUSE</button>
+
+    <div class="arcade-container">
+        <div style="position: relative; width: 100%; max-width: 1200px;">
+            <canvas id="bigGameCanvas"></canvas>
+            
+            <div id="ui-layer" style="position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; color: #fff; font-size: 18px;">
+                <div>SCORE: <span id="game-score">0</span></div>
+                <div>LIFE: <span id="game-life">❤️❤️❤️</span></div>
+            </div>
+
+            <div id="game-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10;">
+                <h1 id="status-title" style="color: #e63946; margin-bottom: 30px; font-size: 40px;">KATANA HERO</h1>
+                <p id="status-msg" style="margin-bottom: 20px; font-size: 12px; color: #fff;">DEFEAT THE EVIL SAMURAI BOSS!</p>
+                <button id="play-btn" class="pixel-btn" style="width: auto; padding: 20px 40px;">START MISSION</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="slash-sound"><source src="assets/katana-slash.mp3" type="audio/mpeg"></audio>
+
+    <script>
+const canvas = document.getElementById('bigGameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('game-score');
+const lifeEl = document.getElementById('game-life');
+const overlay = document.getElementById('game-overlay');
+const playBtn = document.getElementById('play-btn');
+const pauseBtn = document.getElementById('pause-btn');
+const statusTitle = document.getElementById('status-title');
+
+let score = 0;
+let lives = 3;
+let gameRunning = false;
+let isPaused = false;
+let enemies = [];
+let arrows = []; // مصفوفة السهام
+let boss = null;
+let gameSpeed = 1;
+
+function initCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+}
+window.addEventListener('resize', initCanvas);
+initCanvas();
+
+function drawPixelSamurai(ctx, x, y, size, isBoss = false) {
+    const p = size / 10;
+    // الخوذة
+    ctx.fillStyle = isBoss ? "#222" : "#333"; 
+    ctx.fillRect(x + 2*p, y, 6*p, 4*p);
+    // العيون المتوهجة
+    ctx.fillStyle = "#ff0000";
+    ctx.fillRect(x + 3*p, y + 5*p, p, p);
+    ctx.fillRect(x + 6*p, y + 5*p, p, p);
+    // الدرع
+    ctx.fillStyle = isBoss ? "#4a0000" : "#800000";
+    ctx.fillRect(x + p, y + 8*p, 8*p, 3*p);
+}
+
+class Enemy {
+    constructor() {
+        this.size = 40;
+        this.x = Math.random() * (canvas.width - this.size);
+        this.y = canvas.height + this.size;
+        this.speed = (Math.random() * 2 + 2) * gameSpeed;
+    }
+    draw() { drawPixelSamurai(ctx, this.x, this.y, this.size); }
+    update() { if(!isPaused) this.y -= this.speed; }
+}
+
+class Arrow {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.w = 10;
+        this.h = 30;
+        this.speed = 6 * gameSpeed;
+    }
+    draw() {
+        ctx.fillStyle = "#ffd700";
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(this.x + 2, this.y + 25, 6, 5); // رأس السهم
+    }
+    update() { if(!isPaused) this.y += this.speed; }
+}
+
+class Boss {
+    constructor() {
+        this.size = 150;
+        this.x = canvas.width / 2 - 75;
+        this.y = -200;
+        this.hp = 15;
+        this.targetY = 80;
+        this.direction = 1;
+        this.lastShot = 0;
+    }
+    draw() {
+        drawPixelSamurai(ctx, this.x, this.y, this.size, true);
+        // شريط الصحة
+        ctx.fillStyle = "#ff0000";
+        ctx.fillRect(this.x, this.y - 25, (this.hp/15)*this.size, 10);
+    }
+    update() {
+        if(isPaused) return;
+        if (this.y < this.targetY) this.y += 2;
+        else {
+            this.x += (4 * gameSpeed) * this.direction;
+            if(this.x > canvas.width - this.size || this.x < 0) this.direction *= -1;
+            
+            // إطلاق السهام
+            if (Date.now() - this.lastShot > 1500 / gameSpeed) {
+                arrows.push(new Arrow(this.x + this.size/2, this.y + this.size));
+                this.lastShot = Date.now();
+            }
+        }
+    }
+}
+
+function gameOver() {
+    gameRunning = false;
+    overlay.style.display = 'flex';
+    overlay.innerHTML = `<h1 style="color:#e63946">MISSION FAILED</h1><p style="color:#fff">SCORE: ${score}</p><button onclick="location.reload()" class="pixel-btn" style="width:auto; padding:10px">RETRY</button>`;
+}
+
+// --- تعديل في منطق ظهور الأعداء داخل gameLoop ---
+function gameLoop() {
+    if (!gameRunning || isPaused) {
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // ضبط السرعة بحيث لا تتخطى حد الجنون
+    gameSpeed = Math.min(1 + (score / 1000), 2.5); // السقف هو 2.5 ضعف السرعة الأصلية
+
+    if (score >= 100 && !boss) boss = new Boss();
+
+    if (boss) {
+        boss.update();
+        boss.draw();
+        // تقليل ظهور الأعداء الصغار بنسبة 70% أثناء وجود الوحش
+        if (Math.random() < 0.01) enemies.push(new Enemy()); 
+    } else {
+        // ظهور طبيعي للأعداء الصغار
+        if (Math.random() < 0.025) enemies.push(new Enemy());
+    }
+
+    // تحديث السهام مع منطقة صد أوسع
+    arrows.forEach((arrow, index) => {
+        arrow.update();
+        arrow.draw();
+        if (arrow.y > canvas.height) {
+            arrows.splice(index, 1);
+            lives--;
+            lifeEl.innerText = "❤️".repeat(lives);
+            if (lives <= 0) gameOver();
+        }
+    });
+
+    enemies.forEach((enemy, index) => {
+        enemy.update();
+        enemy.draw();
+        if (enemy.y + enemy.size < 0) {
+            enemies.splice(index, 1);
+            lives--;
+            lifeEl.innerText = "❤️".repeat(lives);
+            if (lives <= 0) gameOver();
+        }
+    });
+
+    requestAnimationFrame(gameLoop);
+}
+
+// --- تعديل مستشعر النقر ليكون أكثر استجابة ---
+canvas.addEventListener('mousedown', (e) => {
+    if (!gameRunning || isPaused) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // زيادة مساحة النقر للسهام (Hitbox padding) لسهولة الصد
+    const padding = 25; 
+
+    arrows.forEach((arrow, index) => {
+        if (x > arrow.x - padding && x < arrow.x + arrow.w + padding && 
+            y > arrow.y - padding && y < arrow.y + arrow.h + padding) {
+            arrows.splice(index, 1);
+            document.getElementById('slash-sound').cloneNode(true).play();
+        }
+    });
+
+    if (boss && x > boss.x - 10 && x < boss.x + boss.size + 10 && 
+        y > boss.y - 10 && y < boss.y + boss.size + 10) {
+        boss.hp--;
+        // تأثير بصري عند ضرب الوحش (وميض)
+        ctx.fillStyle = "white";
+        ctx.fillRect(boss.x, boss.y, boss.size, boss.size);
+        
+        document.getElementById('slash-sound').cloneNode(true).play();
+        if (boss.hp <= 0) {
+            boss = null;
+            score += 200;
+            scoreEl.innerText = score;
+        }
+    }
+
+    enemies.forEach((enemy, index) => {
+        if (x > enemy.x && x < enemy.x + enemy.size && y > enemy.y && y < enemy.y + enemy.size) {
+            enemies.splice(index, 1);
+            score += 10;
+            scoreEl.innerText = score;
+            document.getElementById('slash-sound').cloneNode(true).play();
+        }
+    });
+});
+canvas.addEventListener('mousedown', (e) => {
+    if (!gameRunning || isPaused) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // صد السهام
+    arrows.forEach((arrow, index) => {
+        if (x > arrow.x - 20 && x < arrow.x + arrow.w + 20 && y > arrow.y - 20 && y < arrow.y + arrow.h + 20) {
+            arrows.splice(index, 1);
+            document.getElementById('slash-sound').cloneNode(true).play();
+        }
+    });
+
+    // ضرب الوحش
+    if (boss && x > boss.x && x < boss.x + boss.size && y > boss.y && y < boss.y + boss.size) {
+        boss.hp--;
+        document.getElementById('slash-sound').cloneNode(true).play();
+        if (boss.hp <= 0) {
+            boss = null;
+            score += 200;
+            scoreEl.innerText = score;
+        }
+    }
+
+    // ضرب الأعداء
+    enemies.forEach((enemy, index) => {
+        if (x > enemy.x && x < enemy.x + enemy.size && y > enemy.y && y < enemy.y + enemy.size) {
+            enemies.splice(index, 1);
+            score += 10;
+            scoreEl.innerText = score;
+            document.getElementById('slash-sound').cloneNode(true).play();
+        }
+    });
+});
+
+pauseBtn.onclick = () => {
+    if (!gameRunning) return;
+    isPaused = !isPaused;
+    pauseBtn.innerText = isPaused ? "RESUME" : "PAUSE";
+    overlay.style.display = isPaused ? 'flex' : 'none';
+    statusTitle.innerText = "PAUSED";
+};
+
+playBtn.onclick = () => {
+    overlay.style.display = 'none';
+    gameRunning = true;
+    isPaused = false;
+    score = 0;
+    lives = 3;
+    enemies = [];
+    arrows = [];
+    boss = null;
+    gameSpeed = 1;
+    lifeEl.innerText = "❤️".repeat(lives);
+    gameLoop();
+};
+    </script>
+</body>
+</html>

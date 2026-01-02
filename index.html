@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samurai Pixel Ultimate</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="samurai-doors">
+        <div class="door-left"></div>
+        <div class="door-right"></div>
+    </div>
+    <audio id="bgMusic" loop>
+        <source src="assets/zen-music.mp3" type="audio/mpeg">
+    </audio>    <audio id="slash-sound"><source src="assets/katana-slash.mp3" type="audio/mpeg"></audio>
+
+    <div id="petals-container"></div>
+    <audio id="bgMusic" loop>
+        <source src="assets/zen-music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="slash-sound">
+        <source src="assets/katana-slash.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div id="petals-container"></div>
+    <nav class="navbar">
+        <div class="logo">SAMURAI PIXEL</div>
+        <div class="nav-controls">
+            <button id="lang-btn" class="control-btn">العربية</button>
+            <button id="theme-btn" class="control-btn">🌙</button>
+            <div id="music-control" class="music-widget">MUSIC: <span id="music-status">on</span></div>
+        </div>
+        <div class="nav-links">
+            <a href="#home" data-en="HOME" data-ar="الرئيسية">HOME</a>
+            <a href="#games" data-en="GAMES" data-ar="الألعاب">GAMES</a>
+            <a href="#store-preview" data-en="STORE" data-ar="المتجر">STORE</a>
+            <a href="#contact" class="contact-tab" data-en="CONTACT" data-ar="تواصل">CONTACT</a>
+        </div>
+    </nav>
+    <section id="home" class="main-card-section">
+        <div class="pixel-main-card">
+            <div class="hero-flex">
+                <div class="hero-text">
+                    <h1 data-en="THE SAMURAI ARCADE" data-ar="أركيد الساموراي">THE SAMURAI ARCADE</h1>
+                    
+                    <p class="description" 
+                       data-en="Step into a digital dojo where legends come to life. Our sanctuary features exclusive 8-bit Samurai challenges, from high-speed Katana duels to strategic Oni defenses. Every pixel is a blade, every click is a strike. Are you ready to claim your glory in our arcade?" 
+                       data-ar="ادخل إلى 'دوجو' رقمي حيث تدب الحياة في الأساطير. يتميز ملاذنا بتحديات ساموراي حصرية بنمط 8-بت، من مبارزات الكاتانا سريعة الوتيرة إلى دفاعات الـ 'أوني' الاستراتيجية. كل بكسل هو نصل، وكل نقرة هي ضربة. هل أنت مستعد لانتزاع مجدك في الأركيد الخاص بنا؟">
+                       Step into a digital dojo where legends come to life. Our sanctuary features exclusive 8-bit Samurai challenges...
+                    </p>
+    
+                    <div class="hero-buttons">
+                        <a href="arena.html" class="pixel-btn-small" data-en="ENTER THE ARENA" data-ar="دخول الساحة">ENTER THE ARENA</a>
+                    </div>
+                </div>
+                <div class="samurai-box">
+                    <img src="assets/samurai.gif" alt="Samurai" class="samurai-img">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="games" class="main-card-section">
+        <div class="pixel-main-card dark-card">
+            <div class="section-tag" data-en="ARCADE DOJO" data-ar="دوجو الألعاب">ARCADE DOJO</div>
+            <div class="game-grid">
+                <div class="game-item">
+                    <div class="game-icon">⚔️</div>
+                    <h3 data-en="KATANA RUSH" data-ar="هجوم الكاتانا">KATANA RUSH</h3>
+                    <p
+                       data-en="Test your reflexes in a high-speed sword duel." 
+                       data-ar="اختبر ردود أفعالك في مبارزة بالسيوف عالية السرعة.">
+                       Test your reflexes in a high-speed sword duel.
+                    </p>
+                    <a href="games.html" class="mini-pixel-btn" data-en="MORE INFO" data-ar="المزيد">MORE INFO</a>
+                </div>
+            
+                <div class="game-item">
+                    <div class="game-icon">👺</div>
+                    <h3 data-en="ONI DEFENSE" data-ar="دفاع أوني">ONI DEFENSE</h3>
+                    <p 
+                       data-en="Protect the village from the night demons." 
+                       data-ar="احمِ القرية من شياطين الليل.">
+                       Protect the village from the night demons.
+                    </p>
+                    <a href="games.html" class="mini-pixel-btn" data-en="MORE INFO" data-ar="المزيد">MORE INFO</a>
+                </div>
+            
+                <div class="game-item">
+                    <div class="game-icon">🌸</div>
+                    <h3 data-en="ZEN MASTER" data-ar="معلم الزين">ZEN MASTER</h3>
+                    <p 
+                       data-en="A strategic puzzle for the calm mind." 
+                       data-ar="لغز استراتيجي للعقل الهادئ.">
+                       A strategic puzzle for the calm mind.
+                    </p>
+                    <a href="games.html" class="mini-pixel-btn" data-en="MORE INFO" data-ar="المزيد">MORE INFO</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="store-preview" class="main-card-section">
+        <div class="pixel-main-card dark-card" style="border-color: #e63946;">
+            <div class="section-tag" style="background: #e63946; color: #fff;" data-en="PREMIUM STORE" data-ar="المتجر المميز">PREMIUM STORE</div>
+            
+            <div class="hero-flex">
+                <div class="hero-text">
+                    <h2 style="color: #e63946;" data-en="UPGRADE YOUR ARMORY" data-ar="طور ترسانتك">UPGRADE YOUR ARMORY</h2>
+                    <p class="description" 
+                       data-en="Get exclusive access to legendary 16-bit titles. From Shogun adventures to Dragon riders, the best pixel games are waiting for you." 
+                       data-ar="احصل على وصول حصري لأساطير الـ 16-بت. من مغامرات الشوغن إلى راكبي التنانين، أفضل ألعاب البكسل بانتظارك.">
+                       Get exclusive access to legendary 16-bit titles...
+                    </p>
+              
+                    <div class="hero-buttons">
+
+                        <a href="store.html" class="pixel-btn-small" style="background: #e63946; color: #fff; border-color: #fff;" data-en="GO TO STORE" data-ar="اذهب للمتجر">GO TO STORE</a>
+                    </div>
+                </div>
+                <div class="samurai-box">
+                    <span style="font-size: 80px; filter: drop-shadow(0 0 10px #e63946);">🎒</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="contact" class="main-card-section">
+        <div class="pixel-main-card">
+            <div class="section-tag" data-en="CONTACT" data-ar="تواصل معنا">CONTACT</div>
+            <form class="contact-form">
+                <input type="text" placeholder="Name" class="p-input">
+                <textarea placeholder="Message" class="p-input"></textarea>
+                <button type="submit" class="pixel-btn" data-en="SEND" data-ar="إرسال">SEND</button>
+            </form>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+    <div id="snackbar-container"></div>
+</body>
+</html>

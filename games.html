@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samurai Dojo - Challenges</title>
+    <link rel="stylesheet" href="stylegame.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="samurai-doors">
+        <div class="door-left"></div>
+        <div class="door-right"></div>
+    </div>
+    <div id="petals-container"></div>
+    <audio id="bgMusic" loop><source src="assets/zen-music.mp3" type="audio/mpeg"></audio>
+    <audio id="slash-sound"><source src="assets/katana-slash.mp3" type="audio/mpeg"></audio>
+
+    <nav class="navbar">
+        <div class="logo">SAMURAI<span>PIXEL</span></div>
+        <div class="nav-controls">
+            <button id="music-btn-manual" class="control-btn">MUSIC: <span id="music-status">OFF</span></button>
+            <a href="index.html" class="control-btn" data-en="BACK" data-ar="رجوع" style="text-decoration:none;">BACK</a>
+        </div>
+    </nav>
+
+    <main id="lobby-screen" class="main-card-section">
+        <div class="pixel-main-card">
+            <h1 data-en="THE DOJO CHALLENGES" data-ar="تحديات الدوجو">THE DOJO CHALLENGES</h1>
+            
+            <p class="game-description" 
+               data-en="Master the three arts of the Samurai to collect 60,000 points and win your reward!" 
+               data-ar="أتقن الفنون الثلاثة للساموراي لتجمع 60,000 نقطة وتحصل على مكافأتك!">
+               Master the three arts of the Samurai to collect 60,000 points and win your reward!
+            </p>
+
+            <div class="tutorial-box" style="margin: 20px 0; padding: 15px; border: 2px dashed #e63946; background: rgba(230, 57, 70, 0.1); font-size: 10px; line-height: 1.6;">
+                <div data-en="1. Duel: Tap the Ninjas to defeat them." data-ar="1. المبارزة: اضغط على النينجا لهزيمتهم."></div>
+                <div data-en="2. Training: Protect Sensei from incoming arrows." data-ar="2. التدريب: احمِ المعلم من السهام القادمة."></div>
+                <div data-en="3. Puzzle: Collect armor in order: Wood > Cloth > Mask > Sword." data-ar="3. التركيب: اجمع الدرع بالترتيب: خشب > قماش > قناع > سيف."></div>
+            </div>
+
+            <div class="game-grid">
+                <div class="game-item">
+                    <div class="game-icon">⚔️</div>
+                    <h3 data-en="SWORD DUEL" data-ar="قتال السيوف">SWORD DUEL</h3>
+                    <button class="mini-pixel-btn" onclick="launchGame('duel')" data-en="FIGHT" data-ar="قاتل">FIGHT</button>
+                </div>
+
+                <div class="game-item">
+                    <div class="game-icon">👴</div>
+                    <h3 data-en="SENSEI TRAINING" data-ar="تدريب المعلم">SENSEI TRAINING</h3>
+                    <button class="mini-pixel-btn" onclick="launchGame('sensei')" data-en="LEARN" data-ar="تعلم">LEARN</button>
+                </div>
+
+                <div class="game-item">
+                    <div class="game-icon">🧩</div>
+                    <h3 data-en="ARMOR PUZZLE" data-ar="تركيب الدرع">ARMOR PUZZLE</h3>
+                    <button class="mini-pixel-btn" onclick="launchGame('puzzle')" data-en="BUILD" data-ar="ركب">BUILD</button>
+                </div>
+            </div>
+        </div> </main>
+
+    <div id="game-popup" class="game-overlay hidden">
+        <div class="game-window">
+            <div class="game-header">
+                <div class="stats-left">
+                    <span id="score-val">0</span> | BEST: <span id="high-score">0</span>
+                </div>
+                <div id="lives-container">❤️❤️❤️</div>
+                <button class="close-game-btn" onclick="exitGame()">X</button>
+            </div>
+            <canvas id="gameCanvas" width="500" height="400"></canvas>
+        </div>
+    </div>
+
+    <script src="games.js"></script>
+    <div id="snackbar-container"></div>
+</body>
+</html>
