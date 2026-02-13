@@ -124,30 +124,41 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 document.addEventListener('DOMContentLoaded', () => {
     const doors = document.querySelector('.samurai-doors');
-
-    // 1. عند الدخول: افتح الأبواب بعد تأخير بسيط
-    setTimeout(() => {
-        if (doors) doors.classList.add('open');
-    }, 100);
-
-    // 2. عند الضغط على الروابط: أغلق الأبواب ثم انتقل
-    const navLinks = document.querySelectorAll('a');
     
+    // إزالة كلاس التحميل من الـ Body فوراً لكي تظهر الشاشة
+    document.body.classList.remove('loading');
+
+    // 1. فتح الأبواب عند الدخول
+    if (doors) {
+        // نستخدم requestAnimationFrame لضمان أن المتصفح جاهز للأنيميشن
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                doors.classList.add('open');
+                // جعل الأبواب لا تعيق النقر بعد فتحها
+                doors.style.pointerEvents = 'none'; 
+            }, 300); // تأخير بسيط ليعطي فخامة للحركة
+        });
+    }
+
+    // 2. معالجة الروابط (الانتقال السلس)
+    const navLinks = document.querySelectorAll('a');
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-            // نتحقق أن الرابط داخلي (في نفس الموقع)
-            if (link.hostname === window.location.hostname && !link.hash && link.target !== "_blank") {
+            const href = link.getAttribute('href');
+            
+            // التأكد أن الرابط داخلي وليس مجرد # أو رابط خارجي
+            if (href && !href.startsWith('#') && link.hostname === window.location.hostname) {
                 e.preventDefault();
-                const targetUrl = link.href;
+                
+                if (doors) {
+                    doors.classList.remove('open');
+                    doors.classList.add('close');
+                    doors.style.pointerEvents = 'all'; // منع النقر أثناء الإغلاق
+                }
 
-                // إغلاق الأبواب
-                doors.classList.remove('open');
-                doors.classList.add('close');
-
-                // الانتقال بعد انتهاء الأنيميشن (0.6 ثانية)
                 setTimeout(() => {
-                    window.location.href = targetUrl;
-                }, 600);
+                    window.location.href = href;
+                }, 600); // نفس مدة أنيميشن CSS
             }
         });
     });
@@ -208,4 +219,5 @@ document.addEventListener('DOMContentLoaded', () => {
             // يمكنك هنا إضافة كود لإرسال البيانات إلى EmailJS أو أي Server لاحقاً
         });
     }
+
 });
