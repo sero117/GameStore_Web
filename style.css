@@ -312,10 +312,14 @@ body.loading {
     width: 100%;
     height: 100%;
     display: flex;
-    z-index: 10000; /* للتأكد أنها فوق كل شيء */
-    pointer-events: none; /* لكي لا تمنع النقر عند فتحها */
+    z-index: 10000;
+    pointer-events: none; /* أضف هذا السطر هنا أيضاً كأمان إضافي */
 }
 
+/* تأكد أن الأبواب قابلة للنقر فقط عندما تُغلق */
+.samurai-doors.close {
+    pointer-events: all;
+}
 /* الأبواب (نصفين) */
 .door-left, .door-right {
     width: 50%;
@@ -379,5 +383,6 @@ body.loading {
     transform: translateY(-20px);
     transition: all 0.4s ease;
 }
+
 
 body.rtl .snackbar { direction: rtl; }
