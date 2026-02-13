@@ -8,6 +8,7 @@
     /* شكل الماوس كاتانا */
     cursor: url('assets/katana-cursor.avif') 0 0, auto !important;
 }
+
 /* تطبيق السيف على كل شيء قابل للنقر */
 a, button, .music-widget, .control-btn, .mini-pixel-btn, input, textarea {
     cursor: url('assets/katana-cursor.avif') 0 0, pointer !important;
@@ -27,6 +28,12 @@ body {
     image-rendering: pixelated;
     transition: all 0.4s ease;
     min-height: 100vh;
+    opacity: 1;
+}
+
+/* حالة التحميل الابتدائية */
+body.loading {
+    opacity: 0;
 }
 
 /* 2. الوضع النهاري المطور (تأثير المخطوطة الورقية) */
@@ -65,6 +72,8 @@ body.light-mode .pixel-main-card {
 body.light-mode .hero-text h1 {
     color: #800000;
 }
+
+/* تأثير التعتيم الجانبي الفخم */
 body::after {
     content: "";
     position: fixed;
@@ -72,9 +81,10 @@ body::after {
     width: 100%; height: 100%;
     background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.7) 100%);
     pointer-events: none;
-    z-index: 9999;
+    z-index: 9998;
 }
-/* تأثير النبض لزر المتجر في الصفحة الرئيسية */
+
+/* تأثير النبض لزر المتجر */
 .pixel-btn-small[href="store.html"] {
     animation: pulse 1.5s infinite;
 }
@@ -84,6 +94,7 @@ body::after {
     70% { transform: scale(1.05); box-shadow: 0 0 15px rgba(230, 57, 70, 0); }
     100% { transform: scale(1); box-shadow: 0 0 0 rgba(230, 57, 70, 0); }
 }
+
 /* 3. شريط التنقل (Navbar) */
 .navbar {
     background: #000;
@@ -194,14 +205,28 @@ body::after {
     transform: translateY(-10px);
 }
 
+.game-item p {
+    min-height: 40px; 
+}
+
+/* تحويل MORE INFO لرابط بكسل */
 .mini-pixel-btn {
+    display: inline-block;
+    text-decoration: none;
     background: #e63946;
     color: #fff;
     border: 2px solid #fff;
-    padding: 10px;
-    font-size: 10px;
+    padding: 10px 15px;
+    font-size: 9px;
     cursor: pointer;
     margin-top: 15px;
+    transition: 0.2s;
+}
+
+.mini-pixel-btn:hover {
+    background: #fff;
+    color: #e63946;
+    transform: scale(1.05);
 }
 
 /* 6. المدخلات (Forms) */
@@ -256,55 +281,7 @@ body.light-mode .p-input {
     100% { width: 250px; opacity: 0; }
 }
 
-/* اتجاه النص للغة العربية */
-body.rtl {
-    direction: rtl;
-}
-#gameCanvas {
-    width: 100%;
-    height: 100%;
-    display: block;
-    image-rendering: pixelated;
-}
-/* تحويل زر MORE INFO لرابط يبدو كزر بكسل */
-.mini-pixel-btn {
-    display: inline-block;
-    text-decoration: none;
-    background: #e63946;
-    color: #fff;
-    border: 2px solid #fff;
-    padding: 10px 15px;
-    font-size: 9px;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: 0.2s;
-}
-
-.mini-pixel-btn:hover {
-    background: #fff;
-    color: #e63946;
-    transform: scale(1.05);
-}
-
-.game-item p {
-    min-height: 40px; /* لتوحيد ارتفاع الكروت */
-}
-/* كلاس البداية (تكون الصفحة مخفية) */
-.fade-out {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-/* كلاس الدخول (تظهر الصفحة تدريجياً) */
-body {
-    opacity: 1;
-    transition: opacity 0.5s ease;
-}
-
-body.loading {
-    opacity: 0;
-}
-/* حاوية الأبواب */
+/* 9. الأبواب اليابانية (Samurai Doors) */
 .samurai-doors {
     position: fixed;
     top: 0;
@@ -313,35 +290,32 @@ body.loading {
     height: 100%;
     display: flex;
     z-index: 10000;
-    pointer-events: none; /* أضف هذا السطر هنا أيضاً كأمان إضافي */
+    pointer-events: none;
 }
 
-/* تأكد أن الأبواب قابلة للنقر فقط عندما تُغلق */
 .samurai-doors.close {
     pointer-events: all;
 }
-/* الأبواب (نصفين) */
+
 .door-left, .door-right {
     width: 50%;
     height: 100%;
-    background-color: #0a0a0a; /* لون أسود عميق */
+    background-color: #0a0a0a;
     transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-    border: 2px solid #e63946; /* خط أحمر يظهر عند التقاء الأبواب */
+    border: 2px solid #e63946;
+    background-image: 
+        linear-gradient(rgba(230, 57, 70, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(230, 57, 70, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px; /* نقش ياباني بسيط للأبواب */
 }
 
-/* حالة الفتح */
-.samurai-doors.open .door-left {
-    transform: translateX(-100%);
-}
-.samurai-doors.open .door-right {
-    transform: translateX(100%);
-}
+.samurai-doors.open .door-left { transform: translateX(-100%); }
+.samurai-doors.open .door-right { transform: translateX(100%); }
 
-/* حالة الإغلاق (عند مغادرة الصفحة) */
 .samurai-doors.close .door-left,
-.samurai-doors.close .door-right {
-    transform: translateX(0);
-}
+.samurai-doors.close .door-right { transform: translateX(0); }
+
+/* 10. الإشعارات (Snackbar) */
 #snackbar-container {
     position: fixed;
     bottom: 20px;
@@ -358,7 +332,7 @@ body.loading {
     color: #fff;
     border: 2px solid #e63946;
     padding: 12px 20px;
-    font-size: 10px; /* ليتناسب مع خط البكسل */
+    font-size: 10px;
     font-family: 'Press Start 2P', cursive;
     box-shadow: 5px 5px 0px #000;
     display: flex;
@@ -368,9 +342,7 @@ body.loading {
     min-width: 250px;
 }
 
-/* حالة النجاح (مثلاً عند الشراء) */
 .snackbar.success { border-color: #28a745; }
-/* حالة التنبيه (مثلاً عند انتهاء اللعبة) */
 .snackbar.info { border-color: #f1c40f; }
 
 @keyframes slideUp {
@@ -384,5 +356,13 @@ body.loading {
     transition: all 0.4s ease;
 }
 
-
+/* 11. إعدادات اللغة والكانفاس */
+body.rtl { direction: rtl; }
 body.rtl .snackbar { direction: rtl; }
+
+#gameCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    image-rendering: pixelated;
+}
