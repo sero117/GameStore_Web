@@ -281,39 +281,6 @@ body.light-mode .p-input {
     100% { width: 250px; opacity: 0; }
 }
 
-/* 9. الأبواب اليابانية (Samurai Doors) */
-.samurai-doors {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    z-index: 10000;
-    pointer-events: none;
-}
-
-.samurai-doors.close {
-    pointer-events: all;
-}
-
-.door-left, .door-right {
-    width: 50%;
-    height: 100%;
-    background-color: #0a0a0a;
-    transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-    border: 2px solid #e63946;
-    background-image: 
-        linear-gradient(rgba(230, 57, 70, 0.1) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(230, 57, 70, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px; /* نقش ياباني بسيط للأبواب */
-}
-
-.samurai-doors.open .door-left { transform: translateX(-100%); }
-.samurai-doors.open .door-right { transform: translateX(100%); }
-
-.samurai-doors.close .door-left,
-.samurai-doors.close .door-right { transform: translateX(0); }
 
 /* 10. الإشعارات (Snackbar) */
 #snackbar-container {
@@ -366,3 +333,4 @@ body.rtl .snackbar { direction: rtl; }
     display: block;
     image-rendering: pixelated;
 }
+
