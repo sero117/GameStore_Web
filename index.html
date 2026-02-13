@@ -6,6 +6,17 @@
     <title>Samurai Pixel Ultimate</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const doors = document.querySelector('.samurai-doors');
+                if(doors) {
+                    doors.classList.add('open');
+                    doors.style.pointerEvents = 'none'; // لضمان القدرة على الضغط على ما خلفها
+                }
+            }, 500); 
+        });
+    </script>
 </head>
 <body>
     <div class="samurai-doors">
@@ -138,4 +149,5 @@
     <script src="script.js"></script>
     <div id="snackbar-container"></div>
 </body>
+
 </html>
