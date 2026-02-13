@@ -61,18 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.remove('loading');
 
     // فتح الأبواب عند الدخول
-   // تعديل وظيفة الفتح في بداية الكود
-if (doors) {
-    setTimeout(() => {
-        doors.classList.add('open');
-        // بعد انتهاء الأنيميشن، نحذف الجدار تماماً لكي لا يعيق الضغط
-        setTimeout(() => {
-            if(doors.classList.contains('open')) {
-                doors.style.display = 'none'; 
-            }
-        }, 600); 
-    }, 500);
-}
+
     function forcePlayMusic() {
         const musicSetting = localStorage.getItem('samurai_music_on');
         if (musicSetting !== 'false' && audio && audio.paused) {
@@ -111,29 +100,7 @@ if (doors) {
         };
     }
 
-    // --- 3. معالجة الروابط (الانتقال السلس عبر الأبواب) ---
-// --- 3. معالجة الروابط (تعديل لمنع ظهور الجدار عند تغيير اللغة) ---
-const navLinks = document.querySelectorAll('a');
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        const href = link.getAttribute('href');
-
-        // شرط ذكي: فقط أغلق الأبواب إذا كان الرابط حقيقياً ويؤدي لصفحة أخرى
-        // وليس مجرد رابط فارغ (#) أو زر تغيير لغة
-        if (href && href !== "#" && !href.startsWith('#') && link.hostname === window.location.hostname) {
-            e.preventDefault();
-            if (doors) {
-                doors.style.display = 'flex'; // إعادة إظهار الحاوية أولاً
-                doors.classList.remove('open');
-                doors.classList.add('close');
-                doors.style.pointerEvents = 'all';
-            }
-            setTimeout(() => {
-                window.location.href = href;
-            }, 600);
-        }
-    });
-});
+  
     // --- 4. تأثير ضربة السيف والبتلات ---
     document.addEventListener('mousedown', (e) => {
         if (slashSound) {
@@ -201,4 +168,5 @@ function showSamuraiToast(message, type = 'default') {
         setTimeout(() => toast.remove(), 400);
     }, 3000);
 }
+
 
