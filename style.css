@@ -88,18 +88,26 @@ body::after {
 .navbar {
     background: #000;
     border-bottom: 4px solid #e63946;
-    padding: 15px 40px;
+    padding: 15px 30px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 12px 20px;
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
+.logo {
+    font-size: 14px;
+    white-space: nowrap;
+}
+
 .nav-controls {
     display: flex;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 8px;
     align-items: center;
 }
 
@@ -107,29 +115,57 @@ body::after {
     background: #000;
     border: 2px solid #e63946;
     color: #fff;
-    padding: 5px 12px;
-    font-size: 9px;
+    padding: 6px 10px;
+    font-size: 8px;
+    line-height: 1.4;
     cursor: pointer;
     text-transform: uppercase;
     transition: 0.2s ease;
+    white-space: nowrap;
+}
+
+body.light-mode .control-btn,
+body.light-mode .music-widget {
+    border-color: #8b4513;
+    color: #432b18;
 }
 
 .control-btn:hover, .music-widget:hover {
     background: #e63946;
+    color: #fff;
     transform: translateY(-2px);
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 15px;
+    align-items: center;
 }
 
 .nav-links a {
     color: #fff;
     text-decoration: none;
-    font-size: 10px;
-    margin-left: 15px;
+    font-size: 9px;
+    white-space: nowrap;
 }
 
 .contact-tab {
     background: #e63946;
-    padding: 8px;
+    padding: 8px 10px;
     border: 2px solid #fff;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px 20px;
+    }
+    .logo { text-align: center; }
+    .nav-controls, .nav-links {
+        justify-content: center;
+    }
 }
 
 /* 4. توزيع الكروت والأقسام */

@@ -88,8 +88,9 @@ initCanvas();
 
 function drawPixelSamurai(ctx, x, y, size, isBoss = false) {
     const p = size / 10;
+    if (isBoss) { ctx.save(); ctx.shadowColor = "#ff0000"; ctx.shadowBlur = 25; }
     // الخوذة
-    ctx.fillStyle = isBoss ? "#222" : "#333"; 
+    ctx.fillStyle = isBoss ? "#222" : "#333";
     ctx.fillRect(x + 2*p, y, 6*p, 4*p);
     // العيون المتوهجة
     ctx.fillStyle = "#ff0000";
@@ -98,6 +99,7 @@ function drawPixelSamurai(ctx, x, y, size, isBoss = false) {
     // الدرع
     ctx.fillStyle = isBoss ? "#4a0000" : "#800000";
     ctx.fillRect(x + p, y + 8*p, 8*p, 3*p);
+    if (isBoss) ctx.restore();
 }
 
 class Enemy {
@@ -173,6 +175,13 @@ function gameLoop() {
         return;
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    grad.addColorStop(0, "#1a0d0d");
+    grad.addColorStop(1, "#050505");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "rgba(230, 57, 70, 0.12)";
+    for (let i = 0; i < canvas.width; i += 50) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
 
     // ضبط السرعة بحيث لا تتخطى حد الجنون
     gameSpeed = Math.min(1 + (score / 1000), 2.5); // السقف هو 2.5 ضعف السرعة الأصلية

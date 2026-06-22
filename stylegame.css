@@ -32,10 +32,12 @@ body.light-mode {
 .navbar {
     background: #000;
     border-bottom: 4px solid #e63946;
-    padding: 15px 40px;
+    padding: 15px 30px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 12px 20px;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -48,19 +50,21 @@ body.light-mode .navbar {
 
 .nav-controls {
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .control-btn {
     background: transparent;
     border: 2px solid #e63946;
     color: inherit;
-    padding: 8px 15px;
-    font-size: 9px;
+    padding: 8px 12px;
+    font-size: 8px;
     text-transform: uppercase;
     transition: 0.3s;
     text-decoration: none;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 body.light-mode .control-btn {
@@ -70,6 +74,16 @@ body.light-mode .control-btn {
 .control-btn:hover {
     background: #e63946;
     color: #fff;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px 20px;
+        text-align: center;
+    }
+    .nav-controls { justify-content: center; }
 }
 
 /* =========================================

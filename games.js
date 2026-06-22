@@ -105,9 +105,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- منطق الرسم (Drawing) ---
+    function drawArenaBackground() {
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, "#1a0d0d");
+        grad.addColorStop(1, "#0a0a0a");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "rgba(230, 57, 70, 0.15)";
+        ctx.lineWidth = 1;
+        for (let i = 0; i < canvas.width; i += 40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
+        for (let i = 0; i < canvas.height; i += 40) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke(); }
+    }
+
     function runEngine() {
         if (!gameActive) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawArenaBackground();
         difficulty += 0.0005;
 
         if (bossActive) drawBoss();
@@ -136,31 +149,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawBoss() {
+        ctx.save();
+        ctx.shadowColor = "#ff0000";
+        ctx.shadowBlur = 25;
         ctx.font = "80px serif";
         ctx.fillText("👺", 210, 200);
+        ctx.restore();
+        ctx.fillStyle = "#333";
+        ctx.fillRect(100, 50, 300, 15);
         ctx.fillStyle = "#ff0000";
         ctx.fillRect(100, 50, bossHP * 3, 15);
+        ctx.strokeStyle = "#fff";
+        ctx.strokeRect(100, 50, 300, 15);
     }
 
     function drawDuel() {
         enemies.forEach((enemy, i) => {
             enemy.y += enemy.speed;
+            ctx.save();
+            ctx.shadowColor = "#e63946";
+            ctx.shadowBlur = 12;
             ctx.font = "40px serif";
             ctx.fillText(enemy.type, enemy.x, enemy.y);
+            ctx.restore();
             if (enemy.y > canvas.height) { enemies.splice(i,1); lives--; updateStats(); }
         });
     }
 
     function drawSenseiRoom() {
+        ctx.save();
+        ctx.shadowColor = "#ffd700";
+        ctx.shadowBlur = 15;
         ctx.font = "60px serif";
         ctx.fillText("👴", 220, 350);
+        ctx.restore();
     }
 
     function drawArrows() {
         enemies.forEach((arrow, i) => {
             arrow.x += arrow.speed;
+            ctx.save();
+            ctx.shadowColor = "#ffd700";
+            ctx.shadowBlur = 8;
             ctx.font = "30px serif";
             ctx.fillText("🏹", arrow.x, arrow.y);
+            ctx.restore();
             if (Math.abs(arrow.x - 250) < 30) { enemies.splice(i,1); lives--; updateStats(); }
         });
     }
