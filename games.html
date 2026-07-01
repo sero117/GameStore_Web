@@ -3,15 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samurai Dojo - Challenges</title>
+    <title>Samurai Dojo — Challenges</title>
     <link rel="stylesheet" href="stylegame.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ── Lobby enhancements ── */
+        .lobby-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .lobby-header h1 {
+            font-size: clamp(14px, 3vw, 22px);
+            color: #e63946;
+            text-shadow: 0 0 30px rgba(230,57,70,0.6);
+            margin-bottom: 12px;
+            letter-spacing: 2px;
+        }
+        .lobby-header p {
+            font-size: 8px;
+            color: rgba(255,255,255,0.5);
+            line-height: 2.2;
+        }
+        body.light-mode .lobby-header h1 { color: #8b0000; text-shadow: none; }
+        body.light-mode .lobby-header p  { color: rgba(44,26,14,0.6); }
+
+        /* Total score banner */
+        .score-banner {
+            background: linear-gradient(90deg, transparent, rgba(230,57,70,0.12), transparent);
+            border: 1px solid rgba(230,57,70,0.25);
+            border-left: 3px solid #e63946;
+            padding: 14px 20px;
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        body.light-mode .score-banner {
+            background: linear-gradient(90deg, transparent, rgba(139,69,19,0.08), transparent);
+            border-color: rgba(139,69,19,0.25);
+            border-left-color: #8b4513;
+        }
+        .score-banner-item { text-align: center; }
+        .score-banner-val {
+            display: block;
+            font-size: 16px;
+            color: #e63946;
+            text-shadow: 0 0 16px rgba(230,57,70,0.5);
+        }
+        body.light-mode .score-banner-val { color: #8b0000; text-shadow: none; }
+        .score-banner-label {
+            font-size: 7px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+        body.light-mode .score-banner-label { color: rgba(44,26,14,0.5); }
+
+        /* Game cards */
+        .lobby-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .lobby-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 3px solid transparent;
+            padding: 28px 22px;
+            text-align: center;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .lobby-card[data-game="duel"]   { border-top-color: #e63946; }
+        .lobby-card[data-game="sensei"] { border-top-color: #ffd700; }
+        .lobby-card[data-game="puzzle"] { border-top-color: #00c896; }
+
+        .lobby-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .lobby-card[data-game="duel"]::before   { background: linear-gradient(135deg, rgba(230,57,70,0.06), transparent); }
+        .lobby-card[data-game="sensei"]::before { background: linear-gradient(135deg, rgba(255,215,0,0.06), transparent); }
+        .lobby-card[data-game="puzzle"]::before { background: linear-gradient(135deg, rgba(0,200,150,0.06), transparent); }
+
+        .lobby-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
+        .lobby-card:hover::before { opacity: 1; }
+
+        body.light-mode .lobby-card { background: rgba(139,69,19,0.04); border-color: rgba(139,69,19,0.1); }
+
+        .card-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 14px;
+            line-height: 1;
+        }
+        .card-title {
+            font-size: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        body.light-mode .card-title { color: #2c1a0e; }
+
+        .card-genre {
+            font-size: 7px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .lobby-card[data-game="duel"]   .card-genre { color: #e63946; }
+        .lobby-card[data-game="sensei"] .card-genre { color: #ffd700; }
+        .lobby-card[data-game="puzzle"] .card-genre { color: #00c896; }
+
+        .card-desc {
+            font-size: 7.5px;
+            line-height: 2;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 16px;
+            min-height: 52px;
+        }
+        body.light-mode .card-desc { color: rgba(44,26,14,0.6); }
+
+        .card-best {
+            font-size: 7px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+        body.light-mode .card-best { color: rgba(44,26,14,0.4); }
+        .card-best span {
+            color: #ffd700;
+            text-shadow: 0 0 8px rgba(255,215,0,0.4);
+        }
+
+        .play-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            font-size: 8px;
+            letter-spacing: 1px;
+            border: 2px solid;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+        .lobby-card[data-game="duel"]   .play-btn { border-color: #e63946; color: #e63946; }
+        .lobby-card[data-game="sensei"] .play-btn { border-color: #ffd700; color: #ffd700; }
+        .lobby-card[data-game="puzzle"] .play-btn { border-color: #00c896; color: #00c896; }
+
+        .lobby-card[data-game="duel"]   .play-btn:hover { background: #e63946; color: #fff; box-shadow: 0 0 16px rgba(230,57,70,0.4); }
+        .lobby-card[data-game="sensei"] .play-btn:hover { background: #ffd700; color: #000; box-shadow: 0 0 16px rgba(255,215,0,0.4); }
+        .lobby-card[data-game="puzzle"] .play-btn:hover { background: #00c896; color: #000; box-shadow: 0 0 16px rgba(0,200,150,0.4); }
+
+        /* How to play box */
+        .how-to-play {
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 3px solid rgba(255,255,255,0.2);
+            padding: 18px 22px;
+            margin-top: 4px;
+        }
+        .how-to-play h4 {
+            font-size: 8px;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 14px;
+        }
+        body.light-mode .how-to-play { border-color: rgba(44,26,14,0.1); }
+        body.light-mode .how-to-play h4 { color: rgba(44,26,14,0.4); }
+        .how-to-play ul { list-style: none; }
+        .how-to-play ul li {
+            font-size: 7px;
+            line-height: 2.4;
+            color: rgba(255,255,255,0.45);
+            padding-left: 14px;
+            position: relative;
+        }
+        .how-to-play ul li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #e63946;
+        }
+        body.light-mode .how-to-play ul li { color: rgba(44,26,14,0.55); }
+
+        /* ── Game popup ── */
+        .game-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 5000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .game-window {
+            background: #050505;
+            border: 2px solid rgba(230,57,70,0.5);
+            border-top: 3px solid #e63946;
+            position: relative;
+            box-shadow: 0 0 60px rgba(230,57,70,0.2), 0 24px 64px rgba(0,0,0,0.8);
+            max-width: 95vw;
+        }
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(230,57,70,0.12);
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(230,57,70,0.2);
+            font-size: 8px;
+            gap: 12px;
+        }
+        #score-val { color: #ffd700; letter-spacing: 1px; }
+        #lives-container { color: #fff; letter-spacing: 1px; }
+        .close-game-btn {
+            background: rgba(230,57,70,0.15);
+            border: 1px solid rgba(230,57,70,0.4);
+            color: #e63946;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 8px;
+            font-family: 'Press Start 2P', cursive;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+        .close-game-btn:hover { background: #e63946; color: #fff; }
+        #gameCanvas {
+            display: block;
+            image-rendering: pixelated;
+            max-width: 95vw;
+        }
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
-    <div class="samurai-doors">
-        <div class="door-left"></div>
-        <div class="door-right"></div>
-    </div>
+
+    <div class="samurai-doors"><div class="door-left"></div><div class="door-right"></div></div>
     <div id="petals-container"></div>
     <audio id="bgMusic" loop><source src="assets/zen-music.mp3" type="audio/mpeg"></audio>
     <audio id="slash-sound"><source src="assets/katana-slash.mp3" type="audio/mpeg"></audio>
@@ -19,58 +256,115 @@
     <nav class="navbar">
         <div class="logo">SAMURAI<span>PIXEL</span></div>
         <div class="nav-controls">
-            <button id="music-btn-manual" class="control-btn">MUSIC: <span id="music-status">OFF</span></button>
-            <a href="index.html" class="control-btn" data-en="BACK" data-ar="رجوع" style="text-decoration:none;">BACK</a>
+            <button id="music-btn-manual" class="control-btn">♪ <span id="music-status">OFF</span></button>
+            <a href="index.html" class="control-btn" style="text-decoration:none;"
+               data-en="← BACK" data-ar="→ رجوع">← BACK</a>
         </div>
     </nav>
 
-    <main id="lobby-screen" class="main-card-section">
+    <main class="main-card-section">
         <div class="pixel-main-card">
-            <h1 data-en="THE DOJO CHALLENGES" data-ar="تحديات الدوجو">THE DOJO CHALLENGES</h1>
-            
-            <p class="game-description" 
-               data-en="Master the three arts of the Samurai to collect 60,000 points and win your reward!" 
-               data-ar="أتقن الفنون الثلاثة للساموراي لتجمع 60,000 نقطة وتحصل على مكافأتك!">
-               Master the three arts of the Samurai to collect 60,000 points and win your reward!
-            </p>
 
-            <div class="tutorial-box" style="margin: 20px 0; padding: 15px; border: 2px dashed #e63946; background: rgba(230, 57, 70, 0.1); font-size: 10px; line-height: 1.6;">
-                <div data-en="1. Duel: Tap the Ninjas to defeat them." data-ar="1. المبارزة: اضغط على النينجا لهزيمتهم."></div>
-                <div data-en="2. Training: Protect Sensei from incoming arrows." data-ar="2. التدريب: احمِ المعلم من السهام القادمة."></div>
-                <div data-en="3. Puzzle: Collect armor in order: Wood > Cloth > Mask > Sword." data-ar="3. التركيب: اجمع الدرع بالترتيب: خشب > قماش > قناع > سيف."></div>
+            <!-- Header -->
+            <div class="lobby-header">
+                <div class="section-tag" data-en="DOJO CHALLENGES" data-ar="تحديات الدوجو">DOJO CHALLENGES</div>
+                <h1 data-en="CHOOSE YOUR BATTLE" data-ar="اختر معركتك">CHOOSE YOUR BATTLE</h1>
+                <p data-en="Three disciplines. One warrior. Reach 60,000 points to unlock your reward."
+                   data-ar="ثلاثة فنون. محارب واحد. اجمع 60,000 نقطة لتفتح مكافأتك.">
+                    Three disciplines. One warrior. Reach 60,000 points to unlock your reward.
+                </p>
             </div>
 
-            <div class="game-grid">
-                <div class="game-item">
-                    <div class="game-icon">⚔️</div>
-                    <h3 data-en="SWORD DUEL" data-ar="قتال السيوف">SWORD DUEL</h3>
-                    <button class="mini-pixel-btn" onclick="launchGame('duel')" data-en="FIGHT" data-ar="قاتل">FIGHT</button>
+            <!-- Score banner -->
+            <div class="score-banner">
+                <div class="score-banner-item">
+                    <span class="score-banner-val" id="total-display">0</span>
+                    <span class="score-banner-label" data-en="TOTAL XP" data-ar="مجموع النقاط">TOTAL XP</span>
                 </div>
-
-                <div class="game-item">
-                    <div class="game-icon">👴</div>
-                    <h3 data-en="SENSEI TRAINING" data-ar="تدريب المعلم">SENSEI TRAINING</h3>
-                    <button class="mini-pixel-btn" onclick="launchGame('sensei')" data-en="LEARN" data-ar="تعلم">LEARN</button>
+                <div class="score-banner-item">
+                    <span class="score-banner-val" id="goal-pct">0%</span>
+                    <span class="score-banner-label" data-en="TO REWARD" data-ar="نحو المكافأة">TO REWARD</span>
                 </div>
-
-                <div class="game-item">
-                    <div class="game-icon">🧩</div>
-                    <h3 data-en="ARMOR PUZZLE" data-ar="تركيب الدرع">ARMOR PUZZLE</h3>
-                    <button class="mini-pixel-btn" onclick="launchGame('puzzle')" data-en="BUILD" data-ar="ركب">BUILD</button>
+                <div class="score-banner-item">
+                    <span class="score-banner-val" id="games-played">0</span>
+                    <span class="score-banner-label" data-en="GAMES PLAYED" data-ar="ألعاب لُعبت">GAMES PLAYED</span>
                 </div>
+                <button class="play-btn" style="border-color:#e63946;color:#e63946;font-size:7px;padding:8px 14px;"
+                        onclick="resetProgress()"
+                        data-en="RESET" data-ar="إعادة تعيين">RESET</button>
             </div>
-        </div> </main>
 
+            <!-- Game cards -->
+            <div class="lobby-grid">
+
+                <div class="lobby-card" data-game="duel">
+                    <span class="card-icon">⚔️</span>
+                    <div class="card-genre" data-en="ACTION · REFLEXES" data-ar="أكشن · ردود أفعال">ACTION · REFLEXES</div>
+                    <div class="card-title" data-en="SWORD DUEL" data-ar="مبارزة السيوف">SWORD DUEL</div>
+                    <p class="card-desc"
+                       data-en="Ninjas fall from the sky. Tap them before they escape. Build combos for bonus points."
+                       data-ar="النينجا يسقطون من السماء. اضغط عليهم قبل أن يفلتوا. ابنِ كومبو للنقاط الإضافية.">
+                        Ninjas fall from the sky. Tap them before they escape. Build combos for bonus points.
+                    </p>
+                    <div class="card-best" data-en="BEST:" data-ar="أعلى نتيجة:">BEST: <span id="best-duel">0</span></div>
+                    <button class="play-btn" onclick="launchGame('duel')"
+                            data-en="⚔ FIGHT" data-ar="⚔ قاتل">⚔ FIGHT</button>
+                </div>
+
+                <div class="lobby-card" data-game="sensei">
+                    <span class="card-icon">🏹</span>
+                    <div class="card-genre" data-en="DEFENSE · TIMING" data-ar="دفاع · توقيت">DEFENSE · TIMING</div>
+                    <div class="card-title" data-en="SENSEI GUARD" data-ar="حماية المعلم">SENSEI GUARD</div>
+                    <p class="card-desc"
+                       data-en="Arrows fly from both sides. Deflect them to protect your Sensei. Miss three and it's over."
+                       data-ar="السهام تطير من الجانبين. اصرفها لحماية معلمك. افوّت ثلاثة وانتهى الأمر.">
+                        Arrows fly from both sides. Deflect them to protect your Sensei. Miss three and it's over.
+                    </p>
+                    <div class="card-best" data-en="BEST:" data-ar="أعلى نتيجة:">BEST: <span id="best-sensei">0</span></div>
+                    <button class="play-btn" onclick="launchGame('sensei')"
+                            data-en="🛡 DEFEND" data-ar="🛡 دافع">🛡 DEFEND</button>
+                </div>
+
+                <div class="lobby-card" data-game="puzzle">
+                    <span class="card-icon">🧩</span>
+                    <div class="card-genre" data-en="PUZZLE · MEMORY" data-ar="ألغاز · ذاكرة">PUZZLE · MEMORY</div>
+                    <div class="card-title" data-en="ARMOR PUZZLE" data-ar="تركيب الدرع">ARMOR PUZZLE</div>
+                    <p class="card-desc"
+                       data-en="Pieces of armor bounce around. Collect them in the correct order to assemble the set."
+                       data-ar="قطع الدرع تتحرك في كل مكان. اجمعها بالترتيب الصحيح لتجميع المجموعة.">
+                        Pieces of armor bounce around. Collect them in the correct order to assemble the set.
+                    </p>
+                    <div class="card-best" data-en="BEST:" data-ar="أعلى نتيجة:">BEST: <span id="best-puzzle">0</span></div>
+                    <button class="play-btn" onclick="launchGame('puzzle')"
+                            data-en="🧩 BUILD" data-ar="🧩 ركّب">🧩 BUILD</button>
+                </div>
+
+            </div>
+
+            <!-- How to play -->
+            <div class="how-to-play">
+                <h4 data-en="HOW TO PLAY" data-ar="كيف تلعب">HOW TO PLAY</h4>
+                <ul>
+                    <li data-en="Click / tap enemies and objects to interact" data-ar="انقر / اضغط على الأعداء والأشياء للتفاعل">Click / tap enemies and objects to interact</li>
+                    <li data-en="Each game lasts 60 seconds — score as high as you can" data-ar="كل لعبة تستمر 60 ثانية — احصل على أعلى نقطة ممكنة">Each game lasts 60 seconds — score as high as you can</li>
+                    <li data-en="Build combos in Sword Duel for x2 / x3 multipliers" data-ar="ابنِ كومبو في مبارزة السيوف للحصول على x2 / x3 مضاعف">Build combos in Sword Duel for x2 / x3 multipliers</li>
+                    <li data-en="Collect armor in order: 🪵 Wood → 👘 Cloth → 👺 Mask → ⚔️ Sword" data-ar="اجمع الدرع بالترتيب: 🪵 خشب ← 👘 قماش ← 👺 قناع ← ⚔️ سيف">Collect armor in order: 🪵 Wood → 👘 Cloth → 👺 Mask → ⚔️ Sword</li>
+                    <li data-en="Accumulate 60,000 total XP across all games to unlock a 25% discount" data-ar="اجمع 60,000 نقطة إجمالية لفتح خصم 25%">Accumulate 60,000 total XP to unlock a 25% store discount</li>
+                </ul>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Game popup -->
     <div id="game-popup" class="game-overlay hidden">
         <div class="game-window">
             <div class="game-header">
-                <div class="stats-left">
-                    <span id="score-val">0</span> | BEST: <span id="high-score">0</span>
-                </div>
-                <div id="lives-container">❤️❤️❤️</div>
-                <button class="close-game-btn" onclick="exitGame()">X</button>
+                <span id="score-val">SCORE: 0</span>
+                <span id="lives-container">❤ 3  ⏱ 60s</span>
+                <button class="close-game-btn" onclick="exitGame()">✕ EXIT</button>
             </div>
-            <canvas id="gameCanvas" width="500" height="400"></canvas>
+            <canvas id="gameCanvas" width="600" height="420"></canvas>
         </div>
     </div>
 

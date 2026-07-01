@@ -3,290 +3,786 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samurai Arcade - Evil Boss Edition</title>
+    <title>Samurai Pixel — Katana Hero</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        body { overflow: hidden; height: 100vh; display: flex; flex-direction: column; background: #000; }
-        .arcade-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; background: rgba(0,0,0,0.8); }
-        #bigGameCanvas { background: #050505; border: 8px solid #e63946; image-rendering: pixelated; width: 100%; max-width: 1200px; height: 80vh; box-shadow: 0 0 20px #e63946; }
-        .back-home { position: fixed; top: 20px; left: 20px; z-index: 100; }
-        .pause-btn { position: fixed; top: 20px; right: 20px; z-index: 100; background: #e63946; color: #fff; border: 2px solid #fff; padding: 10px; font-family: 'Press Start 2P'; cursor: pointer; font-size: 10px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+            font-family: 'Press Start 2P', monospace;
+        }
+        .arena-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 18px;
+            background: rgba(0,0,0,0.9);
+            border-bottom: 1px solid rgba(230,57,70,0.25);
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .arena-nav .logo { font-size: 11px; color: #fff; letter-spacing: 1px; }
+        .arena-nav .logo span { color: #e63946; }
+        .nav-btns { display: flex; gap: 8px; }
+        .arena-btn {
+            background: transparent;
+            border: 1px solid rgba(230,57,70,0.5);
+            color: #e63946;
+            padding: 6px 14px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 7px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
+        .arena-btn:hover { background: #e63946; color: #fff; }
+
+        .arcade-wrap {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            min-height: 0;
+        }
+        .canvas-shell {
+            position: relative;
+            width: 100%;
+            max-width: 1100px;
+            aspect-ratio: 16 / 9;
+        }
+        #bigGameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            border: 2px solid rgba(230,57,70,0.4);
+            box-shadow: 0 0 40px rgba(230,57,70,0.2), 0 0 80px rgba(0,0,0,0.8);
+        }
+        #game-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+            gap: 16px;
+        }
+        #game-overlay h1 {
+            font-size: clamp(14px, 3vw, 28px);
+            color: #e63946;
+            text-shadow: 0 0 30px rgba(230,57,70,0.6);
+            letter-spacing: 2px;
+        }
+        #game-overlay p {
+            font-size: clamp(6px, 1.2vw, 9px);
+            color: rgba(255,255,255,0.6);
+            line-height: 2.4;
+            max-width: 380px;
+        }
+        #start-btn {
+            background: transparent;
+            border: 2px solid #e63946;
+            color: #e63946;
+            padding: 14px 32px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(7px, 1.4vw, 10px);
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+        #start-btn:hover { background: #e63946; color: #fff; box-shadow: 0 0 20px rgba(230,57,70,0.4); }
+
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="arcade-mode">
-    
-    <a href="index.html" class="pixel-btn-small back-home" data-en="⬅ MENU" data-ar="⬅ القائمة">⬅ MENU</a>
-    <button id="pause-btn" class="pause-btn" data-en="PAUSE" data-ar="إيقاف">PAUSE</button>
+<body>
 
-    <div class="arcade-container">
-        <div style="position: relative; width: 100%; max-width: 1200px;">
+    <nav class="arena-nav">
+        <div class="logo">SAMURAI<span>PIXEL</span></div>
+        <div class="nav-btns">
+            <button id="pause-btn" class="arena-btn" data-en="⏸ PAUSE" data-ar="⏸ إيقاف">⏸ PAUSE</button>
+            <a href="games.html" class="arena-btn" data-en="← DOJO" data-ar="← الدوجو">← DOJO</a>
+            <a href="index.html" class="arena-btn" data-en="⌂ HOME" data-ar="⌂ الرئيسية">⌂ HOME</a>
+        </div>
+    </nav>
+
+    <div class="arcade-wrap">
+        <div class="canvas-shell">
             <canvas id="bigGameCanvas"></canvas>
 
-            <div id="ui-layer" style="position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; color: #fff; font-size: 18px;">
-                <div><span data-en="SCORE:" data-ar="النقاط:">SCORE:</span> <span id="game-score">0</span></div>
-                <div><span data-en="LIFE:" data-ar="الحياة:">LIFE:</span> <span id="game-life">❤️❤️❤️</span></div>
-            </div>
-
-            <div id="game-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 10;">
-                <h1 id="status-title" style="color: #e63946; margin-bottom: 30px; font-size: 40px;" data-en="KATANA HERO" data-ar="بطل الكاتانا">KATANA HERO</h1>
-                <p id="status-msg" style="margin-bottom: 20px; font-size: 12px; color: #fff;" data-en="DEFEAT THE EVIL SAMURAI BOSS!" data-ar="اهزم زعيم الساموراي الشرير!">DEFEAT THE EVIL SAMURAI BOSS!</p>
-                <button id="play-btn" class="pixel-btn" style="width: auto; padding: 20px 40px;" data-en="START MISSION" data-ar="ابدأ المهمة">START MISSION</button>
+            <div id="game-overlay">
+                <h1 data-en="KATANA HERO" data-ar="بطل الكاتانا">KATANA HERO</h1>
+                <p data-en="Click enemies to slash them. Deflect boss arrows. Survive as long as you can."
+                   data-ar="انقر على الأعداء لضربهم. اصرف سهام الزعيم. انجُ أطول وقت ممكن.">
+                    Click enemies to slash them. Deflect boss arrows. Survive as long as you can.
+                </p>
+                <button id="start-btn" data-en="▶ START MISSION" data-ar="▶ ابدأ المهمة">▶ START MISSION</button>
             </div>
         </div>
     </div>
 
     <audio id="bgMusic" loop><source src="assets/zen-music.mp3" type="audio/mpeg"></audio>
     <audio id="slash-sound"><source src="assets/katana-slash.mp3" type="audio/mpeg"></audio>
+    <div id="snackbar-container"></div>
 
     <script>
-(function syncSettings() {
-    const lang = localStorage.getItem('samurai_lang') || 'en';
-    const theme = localStorage.getItem('samurai_theme') || 'dark';
-    const isAr = (lang === 'ar');
+/* ── Settings sync ── */
+(function() {
+    var lang  = localStorage.getItem('samurai_lang')  || 'en';
+    var theme = localStorage.getItem('samurai_theme') || 'dark';
+    var isAr  = lang === 'ar';
+    document.documentElement.lang = isAr ? 'ar' : 'en';
     document.body.classList.toggle('rtl', isAr);
     document.body.classList.toggle('light-mode', theme === 'light');
-    document.querySelectorAll('[data-en]').forEach(el => {
+    document.querySelectorAll('[data-en]').forEach(function(el) {
         el.innerText = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
     });
-
-    const bg = document.getElementById('bgMusic');
+    var bg = document.getElementById('bgMusic');
     if (localStorage.getItem('samurai_music_on') !== 'false') {
-        bg.volume = 0.4;
-        bg.play().catch(() => {
-            window.addEventListener('click', () => bg.play(), { once: true });
+        bg.volume = 0.35;
+        bg.play().catch(function() {
+            window.addEventListener('click', function() { bg.play(); }, { once: true });
         });
     }
 })();
-</script>
+    </script>
 
     <script>
-const canvas = document.getElementById('bigGameCanvas');
-const ctx = canvas.getContext('2d');
-const scoreEl = document.getElementById('game-score');
-const lifeEl = document.getElementById('game-life');
-const overlay = document.getElementById('game-overlay');
-const playBtn = document.getElementById('play-btn');
-const pauseBtn = document.getElementById('pause-btn');
-const statusTitle = document.getElementById('status-title');
+/* ════════════════════════════════════════
+   KATANA HERO — Full Canvas Game
+════════════════════════════════════════ */
+var cv  = document.getElementById('bigGameCanvas');
+var ctx = cv.getContext('2d');
+var overlay  = document.getElementById('game-overlay');
+var startBtn = document.getElementById('start-btn');
+var pauseBtn = document.getElementById('pause-btn');
 
-let score = 0;
-let lives = 3;
-let gameRunning = false;
-let isPaused = false;
-let enemies = [];
-let arrows = []; // مصفوفة السهام
-let boss = null;
-let gameSpeed = 1;
-
-function initCanvas() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+var W, H;
+function resizeCanvas() {
+    var shell = cv.parentElement;
+    W = cv.width  = shell.clientWidth;
+    H = cv.height = shell.clientHeight;
 }
-window.addEventListener('resize', initCanvas);
-initCanvas();
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-function drawPixelSamurai(ctx, x, y, size, isBoss = false) {
-    const p = size / 10;
-    if (isBoss) { ctx.save(); ctx.shadowColor = "#ff0000"; ctx.shadowBlur = 25; }
-    // الخوذة
-    ctx.fillStyle = isBoss ? "#222" : "#333";
-    ctx.fillRect(x + 2*p, y, 6*p, 4*p);
-    // العيون المتوهجة
-    ctx.fillStyle = "#ff0000";
-    ctx.fillRect(x + 3*p, y + 5*p, p, p);
-    ctx.fillRect(x + 6*p, y + 5*p, p, p);
-    // الدرع
-    ctx.fillStyle = isBoss ? "#4a0000" : "#800000";
-    ctx.fillRect(x + p, y + 8*p, 8*p, 3*p);
-    if (isBoss) ctx.restore();
+/* ── State ── */
+var score       = 0;
+var lives       = 3;
+var gameRunning = false;
+var isPaused    = false;
+var gameSpeed   = 1;
+var enemies     = [];
+var arrowList   = [];
+var boss        = null;
+var bossEntry   = false;
+var particles   = [];
+var slashFX     = [];
+var frameCount  = 0;
+var animFrame;
+
+/* ── Sound ── */
+function playSlash() {
+    try { document.getElementById('slash-sound').cloneNode(true).play(); } catch(e) {}
 }
 
-class Enemy {
-    constructor() {
-        this.size = 40;
-        this.x = Math.random() * (canvas.width - this.size);
-        this.y = canvas.height + this.size;
-        this.speed = (Math.random() * 2 + 2) * gameSpeed;
-    }
-    draw() { drawPixelSamurai(ctx, this.x, this.y, this.size); }
-    update() { if(!isPaused) this.y -= this.speed; }
-}
-
-class Arrow {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.w = 10;
-        this.h = 30;
-        this.speed = 6 * gameSpeed;
-    }
-    draw() {
-        ctx.fillStyle = "#ffd700";
-        ctx.fillRect(this.x, this.y, this.w, this.h);
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(this.x + 2, this.y + 25, 6, 5); // رأس السهم
-    }
-    update() { if(!isPaused) this.y += this.speed; }
-}
-
-class Boss {
-    constructor() {
-        this.size = 150;
-        this.x = canvas.width / 2 - 75;
-        this.y = -200;
-        this.hp = 15;
-        this.targetY = 80;
-        this.direction = 1;
-        this.lastShot = 0;
-    }
-    draw() {
-        drawPixelSamurai(ctx, this.x, this.y, this.size, true);
-        // شريط الصحة
-        ctx.fillStyle = "#ff0000";
-        ctx.fillRect(this.x, this.y - 25, (this.hp/15)*this.size, 10);
-    }
-    update() {
-        if(isPaused) return;
-        if (this.y < this.targetY) this.y += 2;
-        else {
-            this.x += (4 * gameSpeed) * this.direction;
-            if(this.x > canvas.width - this.size || this.x < 0) this.direction *= -1;
-            
-            // إطلاق السهام
-            if (Date.now() - this.lastShot > 1500 / gameSpeed) {
-                arrows.push(new Arrow(this.x + this.size/2, this.y + this.size));
-                this.lastShot = Date.now();
-            }
-        }
+/* ── Particles ── */
+function spawnParticles(x, y, col, n) {
+    n = n || 8;
+    for (var i = 0; i < n; i++) {
+        var angle = (Math.PI*2/n)*i + Math.random()*0.5;
+        var spd   = 3 + Math.random()*5;
+        particles.push({ x:x, y:y, vx:Math.cos(angle)*spd, vy:Math.sin(angle)*spd,
+            life:1, decay:0.035+Math.random()*0.04, size:3+Math.random()*5, col:col });
     }
 }
-
-function gameOver() {
-    gameRunning = false;
-    overlay.style.display = 'flex';
-    overlay.innerHTML = `<h1 style="color:#e63946">MISSION FAILED</h1><p style="color:#fff">SCORE: ${score}</p><button onclick="location.reload()" class="pixel-btn" style="width:auto; padding:10px">RETRY</button>`;
+function updateParticles() {
+    particles = particles.filter(function(p){ return p.life > 0; });
+    particles.forEach(function(p) {
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.life-=p.decay;
+        ctx.save(); ctx.globalAlpha=p.life; ctx.fillStyle=p.col;
+        ctx.fillRect(p.x,p.y,p.size,p.size); ctx.restore();
+    });
+}
+function spawnSlashFX(x, y) {
+    slashFX.push({ x:x, y:y, r:20, life:1 });
+}
+function drawSlashFX() {
+    slashFX = slashFX.filter(function(f){ return f.life>0; });
+    slashFX.forEach(function(f) {
+        ctx.save();
+        ctx.globalAlpha = f.life * 0.7;
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth   = 2;
+        ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI*2); ctx.stroke();
+        // X mark
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth   = 1.5;
+        var s = f.r * 0.6;
+        ctx.beginPath(); ctx.moveTo(f.x-s,f.y-s); ctx.lineTo(f.x+s,f.y+s); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(f.x+s,f.y-s); ctx.lineTo(f.x-s,f.y+s); ctx.stroke();
+        ctx.restore();
+        f.r   += 4;
+        f.life -= 0.1;
+    });
 }
 
-// --- تعديل في منطق ظهور الأعداء داخل gameLoop ---
-function gameLoop() {
-    if (!gameRunning || isPaused) {
-        requestAnimationFrame(gameLoop);
+/* ── Background ── */
+function drawBackground() {
+    /* Sky gradient */
+    var sky = ctx.createLinearGradient(0, 0, 0, H);
+    sky.addColorStop(0,   '#020818');
+    sky.addColorStop(0.5, '#0a1428');
+    sky.addColorStop(1,   '#1a0505');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, W, H);
+
+    /* Stars */
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    var starData = [0.08,0.06, 0.22,0.04, 0.38,0.08, 0.55,0.02, 0.70,0.06, 0.85,0.09,
+                    0.14,0.14, 0.45,0.18, 0.62,0.11, 0.78,0.15, 0.93,0.05];
+    for (var i = 0; i < starData.length; i+=2) {
+        var blink = 0.5 + 0.5*Math.sin(frameCount*0.04 + i);
+        ctx.globalAlpha = 0.4 + 0.6*blink;
+        ctx.fillRect(starData[i]*W, starData[i+1]*H, 2, 2);
+    }
+    ctx.globalAlpha = 1;
+
+    /* Moon */
+    var mx = W*0.84, my = H*0.14, mr = H*0.08;
+    var mGrad = ctx.createRadialGradient(mx, my, mr*0.1, mx, my, mr);
+    mGrad.addColorStop(0, '#fff9e0');
+    mGrad.addColorStop(0.7,'#ffe880');
+    mGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = mGrad;
+    ctx.beginPath(); ctx.arc(mx, my, mr, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(2,8,24,0.78)';
+    ctx.beginPath(); ctx.arc(mx - mr*0.28, my - mr*0.12, mr*0.85, 0, Math.PI*2); ctx.fill();
+
+    /* Distant mountains */
+    ctx.fillStyle = 'rgba(10,5,30,0.9)';
+    ctx.beginPath();
+    ctx.moveTo(0, H*0.62);
+    ctx.lineTo(W*0.12, H*0.38); ctx.lineTo(W*0.25, H*0.55);
+    ctx.lineTo(W*0.35, H*0.32); ctx.lineTo(W*0.50, H*0.52);
+    ctx.lineTo(W*0.60, H*0.36); ctx.lineTo(W*0.75, H*0.48);
+    ctx.lineTo(W*0.88, H*0.30); ctx.lineTo(W, H*0.46);
+    ctx.lineTo(W, H*0.62);
+    ctx.closePath(); ctx.fill();
+
+    /* Ground */
+    var gnd = ctx.createLinearGradient(0, H*0.72, 0, H);
+    gnd.addColorStop(0, '#0d0808'); gnd.addColorStop(1, '#050303');
+    ctx.fillStyle = gnd; ctx.fillRect(0, H*0.72, W, H*0.28);
+
+    /* Ground glow line */
+    var gGrad = ctx.createLinearGradient(0, H*0.72, 0, H*0.74);
+    gGrad.addColorStop(0,'rgba(230,57,70,0.5)'); gGrad.addColorStop(1,'transparent');
+    ctx.fillStyle = gGrad; ctx.fillRect(0, H*0.72, W, H*0.04);
+
+    /* Tree silhouettes */
+    drawTree(W*0.05, H*0.72, H*0.28);
+    drawTree(W*0.92, H*0.72, H*0.22);
+    drawTree(W*0.10, H*0.72, H*0.18);
+    drawTree(W*0.88, H*0.72, H*0.32);
+    drawTree(W*0.02, H*0.72, H*0.15);
+
+    /* Fog layer */
+    var fog = ctx.createLinearGradient(0, H*0.55, 0, H*0.72);
+    fog.addColorStop(0,'transparent');
+    fog.addColorStop(0.6,'rgba(10,5,20,0.25)');
+    fog.addColorStop(1,'rgba(10,5,20,0.5)');
+    ctx.fillStyle = fog; ctx.fillRect(0, H*0.55, W, H*0.17);
+}
+
+function drawTree(x, baseY, maxH) {
+    ctx.fillStyle = '#050208';
+    /* Trunk */
+    var tw = maxH * 0.06;
+    ctx.fillRect(x - tw/2, baseY - maxH*0.5, tw, maxH*0.5);
+    /* Canopy layers */
+    [[maxH, maxH*0.38],[maxH*0.75,maxH*0.3],[maxH*0.52,maxH*0.22]].forEach(function(r) {
+        ctx.fillStyle = 'rgba(5,2,10,0.95)';
+        ctx.beginPath();
+        ctx.moveTo(x - r[0]*0.5, baseY - r[0]*0.45);
+        ctx.lineTo(x, baseY - r[0]*0.45 - r[1]);
+        ctx.lineTo(x + r[0]*0.5, baseY - r[0]*0.45);
+        ctx.closePath(); ctx.fill();
+    });
+    /* Blossom glow */
+    var bGrad = ctx.createRadialGradient(x, baseY - maxH*0.75, 0, x, baseY - maxH*0.75, maxH*0.35);
+    bGrad.addColorStop(0,'rgba(180,50,80,0.12)'); bGrad.addColorStop(1,'transparent');
+    ctx.fillStyle = bGrad;
+    ctx.beginPath(); ctx.arc(x, baseY - maxH*0.75, maxH*0.35, 0, Math.PI*2); ctx.fill();
+}
+
+/* ── Pixel samurai character ── */
+function drawPixelWarrior(x, y, size, isBoss) {
+    var p = size / 12;
+    ctx.save();
+    if (isBoss) { ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 30; }
+
+    /* Helmet */
+    ctx.fillStyle = isBoss ? '#1a0000' : '#1a1a2e';
+    ctx.fillRect(x + 2*p, y, 8*p, 5*p);
+    /* Helmet horn */
+    ctx.fillStyle = isBoss ? '#cc0000' : '#e63946';
+    ctx.beginPath();
+    ctx.moveTo(x + 5*p, y - 3*p); ctx.lineTo(x + 4*p, y); ctx.lineTo(x + 6*p, y);
+    ctx.fill();
+    if (isBoss) {
+        ctx.beginPath();
+        ctx.moveTo(x + 7*p, y - 2*p); ctx.lineTo(x + 6.5*p, y); ctx.lineTo(x + 7.5*p, y);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x + 3*p, y - 2*p); ctx.lineTo(x + 2.5*p, y); ctx.lineTo(x + 3.5*p, y);
+        ctx.fill();
+    }
+    /* Face */
+    ctx.fillStyle = '#2a2a40';
+    ctx.fillRect(x + 3*p, y + 4*p, 6*p, 4*p);
+    /* Eyes */
+    ctx.fillStyle = isBoss ? '#ff3300' : '#ff0000';
+    ctx.shadowColor = isBoss ? '#ff3300' : '#ff0000';
+    ctx.shadowBlur  = 12 + 6*Math.sin(frameCount*0.08);
+    ctx.fillRect(x + 3.5*p, y + 5.5*p, 1.5*p, 1.5*p);
+    ctx.fillRect(x + 7*p,   y + 5.5*p, 1.5*p, 1.5*p);
+    ctx.shadowBlur = 0;
+
+    /* Armor / torso */
+    ctx.fillStyle = isBoss ? '#4a0000' : '#7a0000';
+    ctx.fillRect(x + p, y + 8*p, 10*p, 4*p);
+    /* Chest plate line */
+    ctx.strokeStyle = isBoss ? '#ff4400' : '#e63946';
+    ctx.lineWidth = p * 0.5;
+    ctx.beginPath();
+    ctx.moveTo(x + 6*p, y + 8*p); ctx.lineTo(x + 6*p, y + 12*p);
+    ctx.stroke();
+    /* Shoulder pads */
+    ctx.fillStyle = isBoss ? '#660000' : '#aa1111';
+    ctx.fillRect(x, y + 7*p, 2*p, 3*p);
+    ctx.fillRect(x + 10*p, y + 7*p, 2*p, 3*p);
+
+    /* Legs */
+    ctx.fillStyle = isBoss ? '#2a0000' : '#1a1a2e';
+    ctx.fillRect(x + 2*p, y + 12*p, 3*p, 3*p);
+    ctx.fillRect(x + 7*p, y + 12*p, 3*p, 3*p);
+
+    /* Sword (carried at side) */
+    ctx.strokeStyle = isBoss ? '#888' : '#ccc';
+    ctx.lineWidth = p * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(x + 11*p, y + 6*p); ctx.lineTo(x + 13*p, y + 13*p);
+    ctx.stroke();
+    ctx.fillStyle = '#8b4513';
+    ctx.fillRect(x + 10.5*p, y + 5.5*p, 1.5*p, 2*p);
+
+    ctx.restore();
+}
+
+/* ── Enemy ── */
+function Enemy() {
+    this.size  = 44;
+    this.x     = 60 + Math.random() * (W - 120);
+    this.y     = H + this.size;
+    this.speed = (1.5 + Math.random() * 2) * gameSpeed;
+}
+Enemy.prototype.update = function() {
+    if (!isPaused) this.y -= this.speed;
+};
+Enemy.prototype.draw = function() {
+    drawPixelWarrior(this.x - this.size/2, this.y - this.size, this.size, false);
+};
+Enemy.prototype.contains = function(px, py) {
+    return px > this.x - this.size*0.5 && px < this.x + this.size*0.5 &&
+           py > this.y - this.size      && py < this.y;
+};
+
+/* ── Arrow ── */
+function ArrowObj(x, y) {
+    this.x     = x;
+    this.y     = y;
+    this.w     = 8;
+    this.h     = 36;
+    this.speed = 5 * gameSpeed;
+    this.glow  = 0;
+}
+ArrowObj.prototype.update = function() {
+    if (!isPaused) { this.y += this.speed; this.glow += 0.12; }
+};
+ArrowObj.prototype.draw = function() {
+    ctx.save();
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur  = 8 + 6*Math.sin(this.glow);
+
+    /* Shaft */
+    ctx.strokeStyle = '#8b6914';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(this.x + this.w/2, this.y);
+    ctx.lineTo(this.x + this.w/2, this.y + this.h * 0.72);
+    ctx.stroke();
+
+    /* Arrowhead */
+    ctx.fillStyle = '#c8c8c8';
+    ctx.beginPath();
+    ctx.moveTo(this.x + this.w/2 - 6, this.y + this.h * 0.65);
+    ctx.lineTo(this.x + this.w/2, this.y + this.h);
+    ctx.lineTo(this.x + this.w/2 + 6, this.y + this.h * 0.65);
+    ctx.closePath(); ctx.fill();
+
+    /* Fletching */
+    ctx.strokeStyle = '#cc3300'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(this.x + this.w/2, this.y);
+    ctx.lineTo(this.x + this.w/2 - 7, this.y - 10);
+    ctx.moveTo(this.x + this.w/2, this.y);
+    ctx.lineTo(this.x + this.w/2 + 7, this.y - 10);
+    ctx.stroke();
+
+    ctx.restore();
+};
+ArrowObj.prototype.contains = function(px, py) {
+    var pad = 20;
+    return px > this.x - pad && px < this.x + this.w + pad &&
+           py > this.y - pad && py < this.y + this.h + pad;
+};
+
+/* ── Boss ── */
+function Boss() {
+    this.size    = Math.min(W * 0.13, 140);
+    this.x       = W/2 - this.size/2;
+    this.y       = -this.size * 2;
+    this.targetY = H * 0.08;
+    this.hp      = 20;
+    this.maxHP   = 20;
+    this.dir     = 1;
+    this.lastShot= 0;
+    this.entering= true;
+    this.rage    = false;
+    this.hitFlash= 0;
+}
+Boss.prototype.update = function() {
+    if (isPaused) return;
+    if (this.entering) {
+        this.y += 3;
+        if (this.y >= this.targetY) { this.y = this.targetY; this.entering = false; }
         return;
     }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, "#1a0d0d");
-    grad.addColorStop(1, "#050505");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = "rgba(230, 57, 70, 0.12)";
-    for (let i = 0; i < canvas.width; i += 50) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
+    this.rage = this.hp <= this.maxHP * 0.4;
+    var spd = (this.rage ? 6 : 4) * gameSpeed;
+    this.x += spd * this.dir;
+    if (this.x > W - this.size * 1.2 || this.x < this.size * 0.2) this.dir *= -1;
 
-    // ضبط السرعة بحيث لا تتخطى حد الجنون
-    gameSpeed = Math.min(1 + (score / 1000), 2.5); // السقف هو 2.5 ضعف السرعة الأصلية
-
-    if (score >= 100 && !boss) boss = new Boss();
-
-    if (boss) {
-        boss.update();
-        boss.draw();
-        // تقليل ظهور الأعداء الصغار بنسبة 70% أثناء وجود الوحش
-        if (Math.random() < 0.01) enemies.push(new Enemy()); 
-    } else {
-        // ظهور طبيعي للأعداء الصغار
-        if (Math.random() < 0.025) enemies.push(new Enemy());
+    var interval = this.rage ? 900 : 1600;
+    if (Date.now() - this.lastShot > interval / gameSpeed) {
+        arrowList.push(new ArrowObj(this.x + this.size*0.5 - 4, this.y + this.size * 1.1));
+        if (this.rage) {
+            arrowList.push(new ArrowObj(this.x + this.size*0.25, this.y + this.size));
+            arrowList.push(new ArrowObj(this.x + this.size*0.75, this.y + this.size));
+        }
+        this.lastShot = Date.now();
     }
+    if (this.hitFlash > 0) this.hitFlash--;
+};
+Boss.prototype.draw = function() {
+    ctx.save();
+    if (this.hitFlash > 0) {
+        ctx.filter = 'brightness(4)';
+    }
+    drawPixelWarrior(this.x, this.y, this.size, true);
+    ctx.restore();
 
-    // تحديث السهام مع منطقة صد أوسع
-    arrows.forEach((arrow, index) => {
-        arrow.update();
-        arrow.draw();
-        if (arrow.y > canvas.height) {
-            arrows.splice(index, 1);
-            lives--;
-            lifeEl.innerText = "❤️".repeat(lives);
-            if (lives <= 0) gameOver();
-        }
-    });
+    /* HP bar background panel */
+    var bx  = W * 0.18, bby = H * 0.04, bw = W * 0.64, bh = 18;
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(bx - 10, bby - 8, bw + 20, bh + 22);
+    ctx.strokeStyle = 'rgba(230,57,70,0.4)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(bx - 10, bby - 8, bw + 20, bh + 22);
 
-    enemies.forEach((enemy, index) => {
-        enemy.update();
-        enemy.draw();
-        if (enemy.y + enemy.size < 0) {
-            enemies.splice(index, 1);
-            lives--;
-            lifeEl.innerText = "❤️".repeat(lives);
-            if (lives <= 0) gameOver();
-        }
-    });
+    /* HP bar track */
+    ctx.fillStyle = '#1a0000';
+    ctx.fillRect(bx, bby, bw, bh);
 
-    requestAnimationFrame(gameLoop);
+    /* HP bar fill */
+    var pct  = this.hp / this.maxHP;
+    var col  = this.rage ? '#ff4400' : '#e63946';
+    var fill = ctx.createLinearGradient(bx, 0, bx+bw, 0);
+    fill.addColorStop(0, col); fill.addColorStop(1, this.rage ? '#ff8800' : '#ff6675');
+    ctx.fillStyle = fill;
+    ctx.fillRect(bx, bby, bw * pct, bh);
+
+    /* HP bar shine */
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillRect(bx, bby, bw * pct, bh * 0.4);
+
+    /* HP label */
+    ctx.fillStyle = '#fff';
+    ctx.font = '7px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('BOSS  HP  ' + this.hp + ' / ' + this.maxHP, W/2, bby + bh - 3);
+    ctx.textAlign = 'left';
+
+    /* Rage warning */
+    if (this.rage && frameCount % 30 < 15) {
+        ctx.fillStyle = '#ff4400';
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚠ RAGE MODE ⚠', W/2, bby + bh + 18);
+        ctx.textAlign = 'left';
+    }
+};
+Boss.prototype.contains = function(px, py) {
+    return px > this.x - 10 && px < this.x + this.size + 10 &&
+           py > this.y - 10 && py < this.y + this.size + 10;
+};
+
+/* ── HUD ── */
+function drawHUD() {
+    /* Score */
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillRect(0, 0, W, 42);
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '10px "Press Start 2P", monospace';
+    ctx.fillText('SCORE: ' + score, 14, 26);
+
+    /* Lives */
+    ctx.fillStyle = '#e63946';
+    var lifeTxt = '';
+    for (var i = 0; i < lives; i++) lifeTxt += '♥ ';
+    ctx.fillText(lifeTxt, W/2 - 30, 26);
+
+    /* Speed indicator */
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = '7px "Press Start 2P", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('SPD x' + gameSpeed.toFixed(1), W - 14, 26);
+    ctx.textAlign = 'left';
+    ctx.restore();
 }
 
-// --- تعديل مستشعر النقر ليكون أكثر استجابة ---
-canvas.addEventListener('mousedown', (e) => {
+/* ── Game over ── */
+function drawGameOverCanvas(label) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(3,0,10,0.92)';
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = label === 'MISSION FAILED' ? '#e63946' : '#ffd700';
+    ctx.font = 'bold ' + Math.min(W*0.035, 26) + 'px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(label, W/2, H/2 - H*0.12);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = Math.min(W*0.02, 14) + 'px "Press Start 2P", monospace';
+    ctx.fillText('FINAL SCORE: ' + score, W/2, H/2 - H*0.04);
+
+    var bestKey = 'best_arena';
+    var prev    = parseInt(localStorage.getItem(bestKey) || 0);
+    if (score > prev) {
+        localStorage.setItem(bestKey, score);
+        ctx.fillStyle = '#00c896';
+        ctx.font = Math.min(W*0.016, 11) + 'px "Press Start 2P", monospace';
+        ctx.fillText('✦ NEW RECORD! ✦', W/2, H/2 + H*0.04);
+    } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.font = Math.min(W*0.016, 11) + 'px "Press Start 2P", monospace';
+        ctx.fillText('BEST: ' + prev, W/2, H/2 + H*0.04);
+    }
+
+    /* Retry button */
+    var bw2 = 200, bh2 = 36;
+    ctx.fillStyle = 'rgba(230,57,70,0.2)';
+    ctx.fillRect(W/2 - bw2/2, H/2 + H*0.1, bw2, bh2);
+    ctx.strokeStyle = '#e63946'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(W/2 - bw2/2, H/2 + H*0.1, bw2, bh2);
+    ctx.fillStyle = '#fff';
+    ctx.font = '8px "Press Start 2P", monospace';
+    ctx.fillText('CLICK TO RETRY', W/2, H/2 + H*0.1 + 23);
+
+    ctx.restore(); ctx.textAlign = 'left';
+
+    cv.addEventListener('click', function retryHandler() {
+        cv.removeEventListener('click', retryHandler);
+        startGame();
+    }, { once: true });
+}
+
+function endGame(label) {
+    gameRunning = false;
+    cancelAnimationFrame(animFrame);
+    var total = parseInt(localStorage.getItem('samurai_total_accumulated') || 0) + score;
+    localStorage.setItem('samurai_total_accumulated', total);
+    drawGameOverCanvas(label);
+}
+
+/* ── Click/tap handler ── */
+function handleClick(e) {
     if (!gameRunning || isPaused) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    var rect = cv.getBoundingClientRect();
+    var scaleX = W / rect.width, scaleY = H / rect.height;
+    var cx, cy;
+    if (e.touches) {
+        cx = (e.touches[0].clientX - rect.left) * scaleX;
+        cy = (e.touches[0].clientY - rect.top)  * scaleY;
+    } else {
+        cx = (e.clientX - rect.left) * scaleX;
+        cy = (e.clientY - rect.top)  * scaleY;
+    }
 
-    // زيادة مساحة النقر للسهام (Hitbox padding) لسهولة الصد
-    const padding = 25; 
-
-    arrows.forEach((arrow, index) => {
-        if (x > arrow.x - padding && x < arrow.x + arrow.w + padding && 
-            y > arrow.y - padding && y < arrow.y + arrow.h + padding) {
-            arrows.splice(index, 1);
-            document.getElementById('slash-sound').cloneNode(true).play();
+    /* Hit arrows */
+    arrowList = arrowList.filter(function(a) {
+        if (a.contains(cx, cy)) {
+            spawnParticles(a.x + a.w/2, a.y + a.h/2, '#ffd700', 7);
+            spawnSlashFX(a.x + a.w/2, a.y + a.h/2);
+            score += 5;
+            playSlash();
+            return false;
         }
+        return true;
     });
 
-    if (boss && x > boss.x - 10 && x < boss.x + boss.size + 10 && 
-        y > boss.y - 10 && y < boss.y + boss.size + 10) {
+    /* Hit boss */
+    if (boss && boss.contains(cx, cy)) {
         boss.hp--;
-        // تأثير بصري عند ضرب الوحش (وميض)
-        ctx.fillStyle = "white";
-        ctx.fillRect(boss.x, boss.y, boss.size, boss.size);
-        
-        document.getElementById('slash-sound').cloneNode(true).play();
+        boss.hitFlash = 6;
+        spawnParticles(cx, cy, '#ff4400', 10);
+        spawnSlashFX(cx, cy);
+        playSlash();
         if (boss.hp <= 0) {
+            spawnParticles(boss.x + boss.size/2, boss.y + boss.size/2, '#ffd700', 30);
+            score += 500;
             boss = null;
-            score += 200;
-            scoreEl.innerText = score;
         }
     }
 
-    enemies.forEach((enemy, index) => {
-        if (x > enemy.x && x < enemy.x + enemy.size && y > enemy.y && y < enemy.y + enemy.size) {
-            enemies.splice(index, 1);
+    /* Hit enemies */
+    enemies = enemies.filter(function(en) {
+        if (en.contains(cx, cy)) {
+            spawnParticles(en.x, en.y - en.size/2, '#e63946', 10);
+            spawnSlashFX(en.x, en.y - en.size/2);
             score += 10;
-            scoreEl.innerText = score;
-            document.getElementById('slash-sound').cloneNode(true).play();
+            playSlash();
+            return false;
         }
+        return true;
     });
-});
-pauseBtn.onclick = () => {
+}
+
+cv.addEventListener('mousedown', handleClick);
+cv.addEventListener('touchstart', function(e) { e.preventDefault(); handleClick(e); }, { passive: false });
+
+/* ── Pause ── */
+pauseBtn.onclick = function() {
     if (!gameRunning) return;
     isPaused = !isPaused;
-    pauseBtn.innerText = isPaused ? "RESUME" : "PAUSE";
-    overlay.style.display = isPaused ? 'flex' : 'none';
-    statusTitle.innerText = "PAUSED";
+    var isAr = localStorage.getItem('samurai_lang') === 'ar';
+    pauseBtn.textContent = isPaused
+        ? (isAr ? '▶ استمر' : '▶ RESUME')
+        : (isAr ? '⏸ إيقاف' : '⏸ PAUSE');
+    if (isPaused) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
+        ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = '#fff';
+        ctx.font = '18px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', W/2, H/2);
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillText('click RESUME to continue', W/2, H/2 + 36);
+        ctx.restore();
+        ctx.textAlign = 'left';
+    }
 };
 
-playBtn.onclick = () => {
-    overlay.style.display = 'none';
+/* ── Main loop ── */
+function gameLoop() {
+    if (!gameRunning) return;
+    if (isPaused) { animFrame = requestAnimationFrame(gameLoop); return; }
+    frameCount++;
+
+    ctx.clearRect(0, 0, W, H);
+    drawBackground();
+
+    gameSpeed = Math.min(1 + score / 800, 2.8);
+
+    /* Spawn boss */
+    if (score >= 100 && !boss && !bossEntry) {
+        boss = new Boss();
+        bossEntry = true;
+    }
+    if (boss) { boss.update(); boss.draw(); }
+
+    /* Spawn enemies */
+    var spawnChance = boss ? 0.008 : 0.022;
+    if (Math.random() < spawnChance) enemies.push(new Enemy());
+
+    /* Update enemies */
+    enemies = enemies.filter(function(en) {
+        en.update(); en.draw();
+        if (en.y < H * 0.65) {
+            lives--;
+            if (lives <= 0) { endGame('MISSION FAILED'); return false; }
+            spawnParticles(en.x, H*0.65, '#e63946', 5);
+            return false;
+        }
+        return true;
+    });
+
+    /* Update arrows */
+    arrowList = arrowList.filter(function(a) {
+        a.update(); a.draw();
+        if (a.y > H) {
+            lives--;
+            if (lives <= 0) { endGame('MISSION FAILED'); return false; }
+            return false;
+        }
+        return true;
+    });
+
+    updateParticles();
+    drawSlashFX();
+    drawHUD();
+    animFrame = requestAnimationFrame(gameLoop);
+}
+
+/* ── Start ── */
+function startGame() {
+    score      = 0;
+    lives      = 3;
+    isPaused   = false;
     gameRunning = true;
-    isPaused = false;
-    score = 0;
-    lives = 3;
-    enemies = [];
-    arrows = [];
-    boss = null;
-    gameSpeed = 1;
-    lifeEl.innerText = "❤️".repeat(lives);
+    gameSpeed  = 1;
+    enemies    = [];
+    arrowList  = [];
+    boss       = null;
+    bossEntry  = false;
+    particles  = [];
+    slashFX    = [];
+    frameCount = 0;
+
+    overlay.classList.add('hidden');
+    cancelAnimationFrame(animFrame);
     gameLoop();
-};
+}
+
+startBtn.addEventListener('click', function() {
+    startGame();
+});
     </script>
 </body>
 </html>
