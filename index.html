@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Samurai Pixel Ultimate</title>
+    <title>Samurai Pixel — Gaming E-Commerce Platform</title>
+    <meta name="description" content="An interactive pixel gaming store with dynamic catalog, game filtering, reviews, and a full shopping cart built with Vanilla JS.">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <!-- Door Transition -->
     <div class="samurai-doors">
         <div class="door-left"></div>
         <div class="door-right"></div>
     </div>
+
+    <!-- Audio -->
     <audio id="bgMusic" loop>
         <source src="assets/zen-music.mp3" type="audio/mpeg">
     </audio>
@@ -19,116 +24,274 @@
         <source src="assets/katana-slash.mp3" type="audio/mpeg">
     </audio>
 
+    <!-- Petals -->
     <div id="petals-container"></div>
+
+    <!-- ── NAVBAR ─────────────────────────────────────────── -->
     <nav class="navbar">
-        <div class="logo">SAMURAI PIXEL</div>
+        <div class="logo">SAMURAI<span>PIXEL</span></div>
         <div class="nav-controls">
             <button id="lang-btn" class="control-btn">العربية</button>
             <button id="theme-btn" class="control-btn">🌙</button>
-            <div id="music-control" class="music-widget">MUSIC: <span id="music-status">on</span></div>
+            <div id="music-control" class="music-widget">♪ <span id="music-status">ON</span></div>
         </div>
         <div class="nav-links">
-            <a href="#home" data-en="HOME" data-ar="الرئيسية">HOME</a>
-            <a href="#games" data-en="GAMES" data-ar="الألعاب">GAMES</a>
-            <a href="#store-preview" data-en="STORE" data-ar="المتجر">STORE</a>
+            <a href="#home"          data-en="HOME"    data-ar="الرئيسية">HOME</a>
+            <a href="#games"         data-en="GAMES"   data-ar="الألعاب">GAMES</a>
+            <a href="#store-preview" data-en="STORE"   data-ar="المتجر">STORE</a>
             <a href="#contact" class="contact-tab" data-en="CONTACT" data-ar="تواصل">CONTACT</a>
         </div>
     </nav>
+
+    <!-- ── HERO ──────────────────────────────────────────── -->
     <section id="home" class="main-card-section">
         <div class="pixel-main-card">
             <div class="hero-flex">
                 <div class="hero-text">
+                    <div class="section-tag" data-en="PORTFOLIO PROJECT" data-ar="مشروع البورتفوليو">PORTFOLIO PROJECT</div>
                     <h1 data-en="THE SAMURAI ARCADE" data-ar="أركيد الساموراي">THE SAMURAI ARCADE</h1>
-                    
-                    <p class="description" 
-                       data-en="Step into a digital dojo where legends come to life. Our sanctuary features exclusive 8-bit Samurai challenges, from high-speed Katana duels to strategic Oni defenses. Every pixel is a blade, every click is a strike. Are you ready to claim your glory in our arcade?" 
-                       data-ar="ادخل إلى 'دوجو' رقمي حيث تدب الحياة في الأساطير. يتميز ملاذنا بتحديات ساموراي حصرية بنمط 8-بت، من مبارزات الكاتانا سريعة الوتيرة إلى دفاعات الـ 'أوني' الاستراتيجية. كل بكسل هو نصل، وكل نقرة هي ضربة. هل أنت مستعد لانتزاع مجدك في الأركيد الخاص بنا؟">
-                       Step into a digital dojo where legends come to life. Our sanctuary features exclusive 8-bit Samurai challenges...
+                    <p class="description"
+                       data-en="A full-stack gaming e-commerce platform built with pure Vanilla JavaScript. Features a dynamic product catalog with genre filtering, a persistent shopping cart saved to LocalStorage, a live star-rating system, and three playable mini-games — all with bilingual Arabic/English support."
+                       data-ar="منصة تجارة إلكترونية للألعاب مبنية بـ JavaScript خالص. تضم كتالوج منتجات ديناميكي مع فلترة الأنواع، سلة تسوق محفوظة في LocalStorage، نظام تقييم بالنجوم، وثلاث ألعاب قابلة للعب — مع دعم ثنائي اللغة عربي وإنجليزي.">
+                        A full-stack gaming e-commerce platform built with pure Vanilla JavaScript. Features a dynamic product catalog with genre filtering, a persistent shopping cart saved to LocalStorage, a live star-rating system, and three playable mini-games — all with bilingual Arabic/English support.
                     </p>
-    
                     <div class="hero-buttons">
-                        <a href="arena.html" class="pixel-btn-small" data-en="ENTER THE ARENA" data-ar="دخول الساحة">ENTER THE ARENA</a>
+                        <a href="arena.html" class="pixel-btn"
+                           data-en="▶ PLAY NOW" data-ar="▶ العب الآن">▶ PLAY NOW</a>
+                        <a href="store.html" class="pixel-btn-small"
+                           data-en="BROWSE STORE" data-ar="تصفح المتجر">BROWSE STORE</a>
                     </div>
                 </div>
                 <div class="samurai-box">
-                    <img src="assets/samurai.gif" alt="Samurai" class="samurai-img">
+                    <img src="assets/samurai.gif" alt="Pixel Samurai" class="samurai-img">
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label" data-en="Playable Games" data-ar="ألعاب قابلة للعب">Playable Games</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">6</span>
+                    <span class="stat-label" data-en="Store Items" data-ar="منتجات في المتجر">Store Items</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">2</span>
+                    <span class="stat-label" data-en="Languages" data-ar="لغات مدعومة">Languages</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label" data-en="Vanilla JS" data-ar="جافاسكريبت خالص">Vanilla JS</span>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- ── GAMES ──────────────────────────────────────────── -->
     <section id="games" class="main-card-section">
         <div class="pixel-main-card dark-card">
-            <div class="section-tag" data-en="ARCADE DOJO" data-ar="دوجو الألعاب">ARCADE DOJO</div>
+            <div class="section-tag" data-en="MINI GAMES" data-ar="الألعاب">MINI GAMES</div>
             <div class="game-grid">
+
                 <div class="game-item">
-                    <div class="game-icon">⚔️</div>
-                    <h3 data-en="KATANA RUSH" data-ar="هجوم الكاتانا">KATANA RUSH</h3>
-                    <p
-                       data-en="Test your reflexes in a high-speed sword duel." 
-                       data-ar="اختبر ردود أفعالك في مبارزة بالسيوف عالية السرعة.">
-                       Test your reflexes in a high-speed sword duel.
+                    <span class="game-icon">⚔️</span>
+                    <h3 data-en="SWORD DUEL" data-ar="مبارزة السيوف">SWORD DUEL</h3>
+                    <p data-en="Click ninjas before they reach you. Speed and precision required."
+                       data-ar="اضغط على النينجا قبل أن يصلوا إليك. السرعة والدقة مطلوبان.">
+                       Click ninjas before they reach you. Speed and precision required.
                     </p>
-                    <a href="games.html" class="mini-pixel-btn" data-en="MORE INFO" data-ar="المزيد">MORE INFO</a>
+                    <a href="games.html" class="mini-pixel-btn" data-en="PLAY" data-ar="العب">PLAY</a>
                 </div>
-            
+
                 <div class="game-item">
-                    <div class="game-icon">👺</div>
-                    <h3 data-en="ONI DEFENSE" data-ar="دفاع أوني">ONI DEFENSE</h3>
-                    <p 
-                       data-en="Protect the village from the night demons." 
-                       data-ar="احمِ القرية من شياطين الليل.">
-                       Protect the village from the night demons.
+                    <span class="game-icon">👴</span>
+                    <h3 data-en="SENSEI GUARD" data-ar="حماية المعلم">SENSEI GUARD</h3>
+                    <p data-en="Deflect arrows flying from both sides to protect your sensei."
+                       data-ar="اصرف السهام القادمة من الجانبين لحماية معلمك.">
+                       Deflect arrows flying from both sides to protect your sensei.
                     </p>
-                    <a href="games.html" class="mini-pixel-btn" data-en="MORE INFO" data-ar="المزيد">MORE INFO</a>
+                    <a href="games.html" class="mini-pixel-btn" data-en="PLAY" data-ar="العب">PLAY</a>
                 </div>
-            
+
                 <div class="game-item">
-                    <div class="game-icon">🌸</div>
-                    <h3 data-en="ZEN MASTER" data-ar="معلم الزين">ZEN MASTER</h3>
-                    <p 
-                       data-en="A strategic puzzle for the calm mind." 
-                       data-ar="لغز استراتيجي للعقل الهادئ.">
-                       A strategic puzzle for the calm mind.
+                    <span class="game-icon">🧩</span>
+                    <h3 data-en="ARMOR PUZZLE" data-ar="تركيب الدرع">ARMOR PUZZLE</h3>
+                    <p data-en="Collect armor pieces in the correct order to complete the set."
+                       data-ar="اجمع قطع الدرع بالترتيب الصحيح لإكمال المجموعة.">
+                       Collect armor pieces in the correct order to complete the set.
                     </p>
-                    <a href="games.html" class="mini-pixel-btn" data-en="MORE INFO" data-ar="المزيد">MORE INFO</a>
+                    <a href="games.html" class="mini-pixel-btn" data-en="PLAY" data-ar="العب">PLAY</a>
                 </div>
+
             </div>
         </div>
     </section>
+
+    <!-- ── STORE PREVIEW ──────────────────────────────────── -->
     <section id="store-preview" class="main-card-section">
-        <div class="pixel-main-card dark-card" style="border-color: #e63946;">
-            <div class="section-tag" style="background: #e63946; color: #fff;" data-en="PREMIUM STORE" data-ar="المتجر المميز">PREMIUM STORE</div>
-            
+        <div class="pixel-main-card dark-card" style="border-left-color:#e63946;">
+            <div class="section-tag" data-en="STORE" data-ar="المتجر">STORE</div>
             <div class="hero-flex">
                 <div class="hero-text">
-                    <h2 style="color: #e63946;" data-en="UPGRADE YOUR ARMORY" data-ar="طور ترسانتك">UPGRADE YOUR ARMORY</h2>
-                    <p class="description" 
-                       data-en="Get exclusive access to legendary 16-bit titles. From Shogun adventures to Dragon riders, the best pixel games are waiting for you." 
-                       data-ar="احصل على وصول حصري لأساطير الـ 16-بت. من مغامرات الشوغن إلى راكبي التنانين، أفضل ألعاب البكسل بانتظارك.">
-                       Get exclusive access to legendary 16-bit titles...
+                    <h2 style="color:#e63946;"
+                        data-en="UPGRADE YOUR ARMORY"
+                        data-ar="طور ترسانتك">UPGRADE YOUR ARMORY</h2>
+                    <p class="description"
+                       data-en="Browse 6 premium pixel titles with genre filters. Add to cart, rate games, and complete purchase — cart state persists across sessions via LocalStorage."
+                       data-ar="تصفح 6 عناوين بكسل مميزة مع فلاتر الأنواع. أضف للسلة، قيّم الألعاب، وأكمل عملية الشراء — تُحفظ السلة عبر الجلسات باستخدام LocalStorage.">
+                        Browse 6 premium pixel titles with genre filters. Add to cart, rate games, and complete purchase — cart state persists across sessions via LocalStorage.
                     </p>
-              
                     <div class="hero-buttons">
-
-                        <a href="store.html" class="pixel-btn-small" style="background: #e63946; color: #fff; border-color: #fff;" data-en="GO TO STORE" data-ar="اذهب للمتجر">GO TO STORE</a>
+                        <a href="store.html" class="pixel-btn-small"
+                           data-en="GO TO STORE" data-ar="اذهب للمتجر">GO TO STORE</a>
                     </div>
                 </div>
                 <div class="samurai-box">
-                    <span style="font-size: 80px; filter: drop-shadow(0 0 10px #e63946);">🎒</span>
+                    <span style="font-size:72px;filter:drop-shadow(0 0 16px #e63946);">🎮</span>
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- ── TECH STACK ─────────────────────────────────────── -->
+    <section class="main-card-section">
+        <div class="pixel-main-card">
+            <div class="section-tag" data-en="BUILT WITH" data-ar="تقنيات المشروع">BUILT WITH</div>
+            <div class="game-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+
+                <div class="game-item">
+                    <span class="game-icon">🟨</span>
+                    <h3>JAVASCRIPT</h3>
+                    <p data-en="Vanilla ES6+. No frameworks, no dependencies. Pure DOM manipulation."
+                       data-ar="ES6+ خالص. بدون فريموورك أو تبعيات. تحكم مباشر بالـ DOM.">
+                        Vanilla ES6+. No frameworks, no dependencies.
+                    </p>
+                </div>
+
+                <div class="game-item">
+                    <span class="game-icon">🎨</span>
+                    <h3>CSS3</h3>
+                    <p data-en="Animations, custom properties, grid, flexbox, media queries, and dark/light themes."
+                       data-ar="انيميشن، متغيرات مخصصة، گريد، فلكس، ميديا كويريز، وثيمات داكنة/فاتحة.">
+                        Animations, grid, flexbox, responsive themes.
+                    </p>
+                </div>
+
+                <div class="game-item">
+                    <span class="game-icon">💾</span>
+                    <h3>LOCALSTORAGE</h3>
+                    <p data-en="Persistent cart, language preference, and theme — all saved client-side."
+                       data-ar="سلة تسوق محفوظة، تفضيل اللغة، والثيم — كلها محفوظة على جانب العميل.">
+                        Persistent cart, preferences, and game scores.
+                    </p>
+                </div>
+
+                <div class="game-item">
+                    <span class="game-icon">🎮</span>
+                    <h3>CANVAS API</h3>
+                    <p data-en="Three interactive games built with the native HTML5 Canvas API."
+                       data-ar="ثلاث ألعاب تفاعلية مبنية باستخدام Canvas API الأصلية لـ HTML5.">
+                        Three interactive games built with Canvas API.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ── CONTACT ────────────────────────────────────────── -->
     <section id="contact" class="main-card-section">
         <div class="pixel-main-card">
             <div class="section-tag" data-en="CONTACT" data-ar="تواصل معنا">CONTACT</div>
-            <form class="contact-form">
-                <input type="text" placeholder="Name" class="p-input">
-                <textarea placeholder="Message" class="p-input"></textarea>
-                <button type="submit" class="pixel-btn" data-en="SEND" data-ar="إرسال">SEND</button>
-            </form>
+            <div class="hero-flex">
+                <div class="hero-text" style="flex:2;">
+                    <h2 style="margin-bottom:24px;font-size:14px;"
+                        data-en="GET IN TOUCH"
+                        data-ar="تواصل معنا">GET IN TOUCH</h2>
+                    <form class="contact-form">
+                        <input type="text"
+                               placeholder="Your Name"
+                               class="p-input"
+                               data-placeholder-en="Your Name"
+                               data-placeholder-ar="اسمك">
+                        <input type="email"
+                               placeholder="Your Email"
+                               class="p-input"
+                               data-placeholder-en="Your Email"
+                               data-placeholder-ar="بريدك الإلكتروني">
+                        <textarea placeholder="Your Message"
+                                  class="p-input"
+                                  data-placeholder-en="Your Message"
+                                  data-placeholder-ar="رسالتك"></textarea>
+                        <button type="submit" class="pixel-btn"
+                                data-en="SEND MESSAGE" data-ar="إرسال">SEND MESSAGE</button>
+                    </form>
+                </div>
+                <div class="hero-text" style="flex:1;min-width:200px;">
+                    <p class="description" style="font-size:8px;line-height:2.4;">
+                        <span data-en="📧 EMAIL" data-ar="📧 البريد">📧 EMAIL</span><br>
+                        sero201910021@gmail.com<br><br>
+                        <span data-en="🐙 GITHUB" data-ar="🐙 قيثاب">🐙 GITHUB</span><br>
+                        github.com/sero117<br><br>
+                        <span data-en="📍 LOCATION" data-ar="📍 الموقع">📍 LOCATION</span><br>
+                        <span data-en="Available Remotely" data-ar="متاح عن بعد">Available Remotely</span>
+                    </p>
+                </div>
+            </div>
         </div>
     </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────── -->
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo-footer">SAMURAI<span style="color:#e63946">PIXEL</span></div>
+                <p class="footer-tagline"
+                   data-en="A gaming e-commerce platform built to demonstrate front-end engineering skills for portfolio purposes."
+                   data-ar="منصة تجارة إلكترونية للألعاب مبنية لإظهار مهارات هندسة الواجهة الأمامية لأغراض البورتفوليو.">
+                    A gaming e-commerce platform built to demonstrate front-end engineering skills.
+                </p>
+                <div class="tech-badges" style="margin-top:20px;">
+                    <span class="badge">HTML5</span>
+                    <span class="badge">CSS3</span>
+                    <span class="badge">JS ES6+</span>
+                    <span class="badge">Canvas</span>
+                    <span class="badge">LocalStorage</span>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 data-en="NAVIGATE" data-ar="التنقل">NAVIGATE</h4>
+                <ul>
+                    <li><a href="#home"          data-en="Home"    data-ar="الرئيسية">Home</a></li>
+                    <li><a href="#games"         data-en="Games"   data-ar="الألعاب">Games</a></li>
+                    <li><a href="store.html"     data-en="Store"   data-ar="المتجر">Store</a></li>
+                    <li><a href="arena.html"     data-en="Arena"   data-ar="الساحة">Arena</a></li>
+                    <li><a href="#contact"       data-en="Contact" data-ar="تواصل">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 data-en="FEATURES" data-ar="الميزات">FEATURES</h4>
+                <ul>
+                    <li><a href="store.html" data-en="Game Catalog"     data-ar="كتالوج الألعاب">Game Catalog</a></li>
+                    <li><a href="store.html" data-en="Genre Filtering"  data-ar="فلترة الأنواع">Genre Filtering</a></li>
+                    <li><a href="store.html" data-en="Shopping Cart"    data-ar="سلة التسوق">Shopping Cart</a></li>
+                    <li><a href="store.html" data-en="Star Ratings"     data-ar="نظام التقييم">Star Ratings</a></li>
+                    <li><a href="games.html" data-en="Mini Games"       data-ar="ألعاب صغيرة">Mini Games</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span class="footer-copy">
+                <span class="footer-dot"></span>
+                SAMURAI PIXEL
+                <span class="footer-dot"></span>
+                <span data-en="Built with Vanilla JS — Portfolio Project" data-ar="مبني بـ Vanilla JS — مشروع بورتفوليو">Built with Vanilla JS — Portfolio Project</span>
+            </span>
+            <span class="footer-copy" data-en="© 2025 Sarah Salem" data-ar="© 2025 سارة سالم">© 2025 Sarah Salem</span>
+        </div>
+    </footer>
 
     <script src="script.js"></script>
     <div id="snackbar-container"></div>
