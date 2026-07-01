@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samurai Pixel — Player Profile</title>
+    <link rel="stylesheet" href="stylegame.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ── Page layout ── */
+        .profile-wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ── Header ── */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-left: 4px solid #e63946;
+            padding: 28px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        body.light-mode .profile-header {
+            background: rgba(139,69,19,0.05);
+            border-color: rgba(139,69,19,0.12);
+            border-left-color: #8b0000;
+        }
+        .avatar-canvas { display: block; image-rendering: pixelated; flex-shrink: 0; }
+        .profile-info { flex: 1; min-width: 200px; }
+        .profile-name {
+            font-size: clamp(11px, 2.5vw, 16px);
+            color: #fff;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        body.light-mode .profile-name { color: #2c1a0e; }
+        .profile-rank {
+            font-size: 8px;
+            color: #e63946;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            text-shadow: 0 0 10px rgba(230,57,70,0.4);
+        }
+        body.light-mode .profile-rank { text-shadow: none; color: #8b0000; }
+        .profile-xp-bar {
+            background: rgba(255,255,255,0.07);
+            height: 10px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+        .profile-xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e63946, #ff8c00);
+            transition: width 1.2s cubic-bezier(.4,0,.2,1);
+            position: relative;
+        }
+        .profile-xp-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            height: 100%; width: 40px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+        }
+        .profile-xp-label {
+            font-size: 7px;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+        }
+        body.light-mode .profile-xp-label { color: rgba(44,26,14,0.5); }
+        .profile-badges {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .badge-pill {
+            font-size: 7px;
+            padding: 4px 10px;
+            border-radius: 2px;
+            letter-spacing: 1px;
+        }
+        .badge-pill.red   { background: rgba(230,57,70,0.18); border: 1px solid rgba(230,57,70,0.4); color: #e63946; }
+        .badge-pill.gold  { background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.35); color: #ffd700; }
+        .badge-pill.green { background: rgba(0,200,150,0.12); border: 1px solid rgba(0,200,150,0.35); color: #00c896; }
+        .badge-pill.grey  { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.3); }
+        body.light-mode .badge-pill.grey { color: rgba(44,26,14,0.3); }
+
+        /* ── Stats grid ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            padding: 18px 16px;
+            text-align: center;
+        }
+        body.light-mode .stat-card { background: rgba(139,69,19,0.04); border-color: rgba(139,69,19,0.1); }
+        .stat-card .val {
+            display: block;
+            font-size: 18px;
+            color: #ffd700;
+            text-shadow: 0 0 14px rgba(255,215,0,0.35);
+            margin-bottom: 8px;
+        }
+        body.light-mode .stat-card .val { color: #8b4513; text-shadow: none; }
+        .stat-card .lbl {
+            font-size: 6.5px;
+            color: rgba(255,255,255,0.35);
+            letter-spacing: 1.5px;
+        }
+        body.light-mode .stat-card .lbl { color: rgba(44,26,14,0.45); }
+
+        /* ── Section header ── */
+        .section-header {
+            font-size: 8px;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 3px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            margin-bottom: 18px;
+            text-transform: uppercase;
+        }
+        body.light-mode .section-header { color: rgba(44,26,14,0.35); border-color: rgba(44,26,14,0.1); }
+
+        /* ── Per-game best scores ── */
+        .game-scores { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+        .game-score-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
+            flex-wrap: wrap;
+        }
+        body.light-mode .game-score-row { background: rgba(139,69,19,0.03); border-color: rgba(139,69,19,0.08); }
+        .game-score-icon { font-size: 24px; flex-shrink: 0; }
+        .game-score-info { flex: 1; min-width: 120px; }
+        .game-score-name { font-size: 8px; color: #fff; margin-bottom: 6px; }
+        body.light-mode .game-score-name { color: #2c1a0e; }
+        .game-score-bar {
+            height: 7px;
+            background: rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+        .game-score-fill { height: 100%; transition: width 1.4s cubic-bezier(.4,0,.2,1); }
+        .game-score-fill.red   { background: linear-gradient(90deg,#e63946,#ff6675); }
+        .game-score-fill.gold  { background: linear-gradient(90deg,#ffd700,#ffb300); }
+        .game-score-fill.green { background: linear-gradient(90deg,#00c896,#00a876); }
+        .game-score-fill.blue  { background: linear-gradient(90deg,#4488ff,#2266cc); }
+        .game-score-num { font-size: 10px; color: #ffd700; flex-shrink: 0; min-width: 60px; text-align: right; }
+        body.light-mode .game-score-num { color: #8b4513; }
+
+        /* ── Achievements ── */
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .achievement {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 14px;
+            border: 1px solid;
+            position: relative;
+            overflow: hidden;
+        }
+        .achievement.unlocked {
+            background: rgba(255,215,0,0.06);
+            border-color: rgba(255,215,0,0.2);
+        }
+        .achievement.locked {
+            background: rgba(255,255,255,0.02);
+            border-color: rgba(255,255,255,0.06);
+            filter: grayscale(1);
+            opacity: 0.45;
+        }
+        body.light-mode .achievement.unlocked { background: rgba(139,69,19,0.06); border-color: rgba(139,69,19,0.2); }
+        .ach-icon { font-size: 22px; flex-shrink: 0; }
+        .ach-body { flex: 1; }
+        .ach-name { font-size: 7px; color: #fff; margin-bottom: 4px; line-height: 1.6; }
+        body.light-mode .ach-name { color: #2c1a0e; }
+        .ach-desc { font-size: 6px; color: rgba(255,255,255,0.35); line-height: 1.8; }
+        body.light-mode .ach-desc { color: rgba(44,26,14,0.4); }
+        .ach-check {
+            position: absolute;
+            top: 6px; right: 8px;
+            font-size: 8px;
+            color: #ffd700;
+        }
+
+        /* ── Unlock reward banner ── */
+        .reward-banner {
+            background: linear-gradient(90deg, rgba(255,215,0,0.07), rgba(255,140,0,0.1), rgba(255,215,0,0.07));
+            border: 1px solid rgba(255,215,0,0.25);
+            border-left: 4px solid #ffd700;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        body.light-mode .reward-banner {
+            background: linear-gradient(90deg, rgba(139,69,19,0.06), rgba(180,100,20,0.09), rgba(139,69,19,0.06));
+            border-color: rgba(139,69,19,0.25);
+            border-left-color: #8b4513;
+        }
+        .reward-icon { font-size: 32px; flex-shrink: 0; }
+        .reward-text { flex: 1; }
+        .reward-title { font-size: 9px; color: #ffd700; margin-bottom: 6px; letter-spacing: 1px; }
+        body.light-mode .reward-title { color: #8b4513; }
+        .reward-desc { font-size: 7px; color: rgba(255,255,255,0.5); line-height: 2; }
+        body.light-mode .reward-desc { color: rgba(44,26,14,0.5); }
+        .reward-progress {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            min-width: 120px;
+        }
+        .reward-pct { font-size: 18px; color: #ffd700; }
+        body.light-mode .reward-pct { color: #8b4513; }
+        .reward-bar { width: 120px; height: 8px; background: rgba(255,255,255,0.08); }
+        .reward-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
+            transition: width 1.4s cubic-bezier(.4,0,.2,1);
+        }
+
+        /* ── Action buttons ── */
+        .action-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .action-btn {
+            padding: 12px 22px;
+            font-size: 8px;
+            font-family: 'Press Start 2P', cursive;
+            letter-spacing: 1px;
+            border: 2px solid;
+            background: transparent;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .action-btn.red   { border-color: #e63946; color: #e63946; }
+        .action-btn.gold  { border-color: #ffd700; color: #ffd700; }
+        .action-btn.green { border-color: #00c896; color: #00c896; }
+        .action-btn.red:hover   { background: #e63946; color: #fff; box-shadow: 0 0 16px rgba(230,57,70,0.4); }
+        .action-btn.gold:hover  { background: #ffd700; color: #000; box-shadow: 0 0 16px rgba(255,215,0,0.4); }
+        .action-btn.green:hover { background: #00c896; color: #000; box-shadow: 0 0 16px rgba(0,200,150,0.4); }
+    </style>
+</head>
+<body>
+    <div class="samurai-doors"><div class="door-left"></div><div class="door-right"></div></div>
+    <div id="petals-container"></div>
+    <audio id="bgMusic" loop><source src="assets/zen-music.mp3" type="audio/mpeg"></audio>
+
+    <nav class="navbar">
+        <div class="logo">SAMURAI<span>PIXEL</span></div>
+        <div class="nav-controls">
+            <button id="music-btn-manual" class="control-btn">♪ <span id="music-status">OFF</span></button>
+            <button id="theme-btn" class="control-btn">🌙</button>
+            <button id="lang-btn" class="control-btn">العربية</button>
+            <a href="games.html" class="control-btn" style="text-decoration:none;"
+               data-en="← DOJO" data-ar="← الدوجو">← DOJO</a>
+        </div>
+    </nav>
+
+    <main class="main-card-section">
+      <div class="pixel-main-card">
+        <div class="profile-wrap">
+
+          <!-- ─────── HEADER ─────── -->
+          <div class="profile-header">
+              <canvas class="avatar-canvas" id="avatarCanvas" width="90" height="110"></canvas>
+              <div class="profile-info">
+                  <div class="profile-name" id="profile-name">SAMURAI_WARRIOR</div>
+                  <div class="profile-rank" id="profile-rank">⚔ RANK: RONIN</div>
+                  <div class="profile-xp-bar">
+                      <div class="profile-xp-fill" id="xp-fill" style="width:0%"></div>
+                  </div>
+                  <div class="profile-xp-label">
+                      <span id="xp-label">0 / 60,000 XP TO MASTER RANK</span>
+                  </div>
+                  <div class="profile-badges" id="profile-badges"></div>
+              </div>
+          </div>
+
+          <!-- ─────── STATS ─────── -->
+          <div class="section-header" data-en="— STATISTICS" data-ar="— الإحصائيات">— STATISTICS</div>
+          <div class="stats-grid">
+              <div class="stat-card">
+                  <span class="val" id="s-total">0</span>
+                  <span class="lbl" data-en="TOTAL XP" data-ar="مجموع النقاط">TOTAL XP</span>
+              </div>
+              <div class="stat-card">
+                  <span class="val" id="s-played">0</span>
+                  <span class="lbl" data-en="GAMES PLAYED" data-ar="مجموع الجلسات">GAMES PLAYED</span>
+              </div>
+              <div class="stat-card">
+                  <span class="val" id="s-best">0</span>
+                  <span class="lbl" data-en="SINGLE GAME BEST" data-ar="أفضل جلسة واحدة">SINGLE GAME BEST</span>
+              </div>
+              <div class="stat-card">
+                  <span class="val" id="s-unlocked">0/7</span>
+                  <span class="lbl" data-en="ACHIEVEMENTS" data-ar="الإنجازات">ACHIEVEMENTS</span>
+              </div>
+          </div>
+
+          <!-- ─────── REWARD BANNER ─────── -->
+          <div class="reward-banner">
+              <div class="reward-icon" id="reward-icon">🎁</div>
+              <div class="reward-text">
+                  <div class="reward-title" id="reward-title"
+                       data-en="REACH 60,000 XP — UNLOCK 25% STORE DISCOUNT"
+                       data-ar="اجمع 60,000 نقطة — افتح خصم 25% في المتجر">
+                       REACH 60,000 XP — UNLOCK 25% STORE DISCOUNT
+                  </div>
+                  <div class="reward-desc" id="reward-desc"
+                       data-en="Play all three dojo games and accumulate total XP to unlock your coupon."
+                       data-ar="العب الألعاب الثلاثة واجمع النقاط لتفتح كوبون الخصم.">
+                       Play all three dojo games and accumulate total XP to unlock your coupon.
+                  </div>
+              </div>
+              <div class="reward-progress">
+                  <div class="reward-pct" id="reward-pct">0%</div>
+                  <div class="reward-bar"><div class="reward-bar-fill" id="reward-bar-fill" style="width:0%"></div></div>
+              </div>
+          </div>
+
+          <!-- ─────── PER-GAME BESTS ─────── -->
+          <div class="section-header" data-en="— HIGH SCORES" data-ar="— أعلى النتائج">— HIGH SCORES</div>
+          <div class="game-scores">
+              <div class="game-score-row">
+                  <span class="game-score-icon">⚔️</span>
+                  <div class="game-score-info">
+                      <div class="game-score-name" data-en="SWORD DUEL — Ninja Slayer" data-ar="مبارزة السيوف — قاتل النينجا">SWORD DUEL — Ninja Slayer</div>
+                      <div class="game-score-bar"><div class="game-score-fill red" id="bar-duel" style="width:0%"></div></div>
+                  </div>
+                  <div class="game-score-num" id="num-duel">0</div>
+              </div>
+              <div class="game-score-row">
+                  <span class="game-score-icon">🏹</span>
+                  <div class="game-score-info">
+                      <div class="game-score-name" data-en="SENSEI GUARD — Arrow Deflect" data-ar="حماية المعلم — صارف السهام">SENSEI GUARD — Arrow Deflect</div>
+                      <div class="game-score-bar"><div class="game-score-fill gold" id="bar-sensei" style="width:0%"></div></div>
+                  </div>
+                  <div class="game-score-num" id="num-sensei">0</div>
+              </div>
+              <div class="game-score-row">
+                  <span class="game-score-icon">🧩</span>
+                  <div class="game-score-info">
+                      <div class="game-score-name" data-en="ARMOR PUZZLE — Set Builder" data-ar="تركيب الدرع — مجمّع الطقم">ARMOR PUZZLE — Set Builder</div>
+                      <div class="game-score-bar"><div class="game-score-fill green" id="bar-puzzle" style="width:0%"></div></div>
+                  </div>
+                  <div class="game-score-num" id="num-puzzle">0</div>
+              </div>
+              <div class="game-score-row">
+                  <span class="game-score-icon">👺</span>
+                  <div class="game-score-info">
+                      <div class="game-score-name" data-en="KATANA HERO — Boss Slayer" data-ar="بطل الكاتانا — قاتل الزعيم">KATANA HERO — Boss Slayer</div>
+                      <div class="game-score-bar"><div class="game-score-fill blue" id="bar-arena" style="width:0%"></div></div>
+                  </div>
+                  <div class="game-score-num" id="num-arena">0</div>
+              </div>
+          </div>
+
+          <!-- ─────── ACHIEVEMENTS ─────── -->
+          <div class="section-header" data-en="— ACHIEVEMENTS" data-ar="— الإنجازات">— ACHIEVEMENTS</div>
+          <div class="achievements" id="achievements-grid"></div>
+
+          <!-- ─────── ACTIONS ─────── -->
+          <div class="action-row">
+              <a href="games.html" class="action-btn red"
+                 data-en="⚔ PLAY GAMES" data-ar="⚔ العب الألعاب">⚔ PLAY GAMES</a>
+              <a href="store.html" class="action-btn gold"
+                 data-en="🛒 VISIT STORE" data-ar="🛒 زيارة المتجر">🛒 VISIT STORE</a>
+              <a href="arena.html" class="action-btn green"
+                 data-en="👺 BOSS BATTLE" data-ar="👺 معركة الزعيم">👺 BOSS BATTLE</a>
+          </div>
+
+        </div><!-- /profile-wrap -->
+      </div>
+    </main>
+
+    <div id="snackbar-container"></div>
+    <script src="script.js"></script>
+    <script>
+/* ── Achievement definitions ── */
+var ACHIEVEMENTS = [
+    { id:'first_blood',   icon:'🩸', name:'First Blood',        nameAr:'الدم الأول',         desc:'Play your first game',            descAr:'العب لعبتك الأولى',                 check: function(d) { return d.played >= 1; } },
+    { id:'combo_king',    icon:'⚡', name:'Combo King',          nameAr:'ملك الكومبو',        desc:'Score 30+ points in one Duel run', descAr:'احصل على 30+ نقطة في جولة مبارزة',  check: function(d) { return d.duel >= 30; } },
+    { id:'sensei_guard',  icon:'🛡', name:'Faithful Guard',      nameAr:'الحارس الأمين',     desc:'Reach 100 pts deflecting arrows',  descAr:'احصل على 100 نقطة بصرف السهام',    check: function(d) { return d.sensei >= 100; } },
+    { id:'set_master',    icon:'🧩', name:'Set Master',          nameAr:'سيد التجميع',       desc:'Complete an armor set (200+ pts)', descAr:'اكمل طقم درع (200+ نقطة)',          check: function(d) { return d.puzzle >= 200; } },
+    { id:'boss_slayer',   icon:'💀', name:'Boss Slayer',         nameAr:'قاتل الزعيم',       desc:'Score 200+ pts in Katana Hero',    descAr:'احصل على 200+ نقطة في بطل الكاتانا',check: function(d) { return d.arena >= 200; } },
+    { id:'veteran',       icon:'🏆', name:'Veteran Warrior',     nameAr:'المحارب المخضرم',   desc:'Play 10 or more games total',      descAr:'العب 10 ألعاب أو أكثر',             check: function(d) { return d.played >= 10; } },
+    { id:'grand_master',  icon:'👑', name:'Grand Master',        nameAr:'الأستاذ الأكبر',    desc:'Accumulate 60,000 total XP',       descAr:'اجمع 60,000 نقطة إجمالية',         check: function(d) { return d.total >= 60000; } },
+];
+
+/* ── Draw pixel avatar on canvas ── */
+function drawAvatar(cvs) {
+    var c = cvs.getContext('2d');
+    var w = cvs.width, h = cvs.height;
+    c.clearRect(0, 0, w, h);
+
+    var s = w / 9;
+    var cx2 = w / 2, yOff = h * 0.1;
+
+    // Shadow
+    c.fillStyle = 'rgba(0,0,0,0.25)';
+    c.beginPath(); c.ellipse(cx2, h - 8, s*1.6, 6, 0, 0, Math.PI*2); c.fill();
+
+    // Legs
+    c.fillStyle = '#1a1a2e';
+    c.fillRect(cx2 - s*1.1, yOff + s*7.5, s*0.9, s*1.8);
+    c.fillRect(cx2 + s*0.2,  yOff + s*7.5, s*0.9, s*1.8);
+
+    // Robe / body
+    c.fillStyle = '#7a0000';
+    c.fillRect(cx2 - s*1.3, yOff + s*3.8, s*2.6, s*4);
+    // Chest divide line
+    c.strokeStyle = '#e63946'; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(cx2, yOff+s*3.8); c.lineTo(cx2, yOff+s*7.8); c.stroke();
+    // Shoulder pads
+    c.fillStyle = '#aa1111';
+    c.fillRect(cx2 - s*1.8, yOff + s*3.5, s*0.8, s*1.5);
+    c.fillRect(cx2 + s*1.0,  yOff + s*3.5, s*0.8, s*1.5);
+
+    // Arms
+    c.fillStyle = '#7a0000';
+    c.fillRect(cx2 - s*2.0, yOff + s*3.8, s*0.9, s*3.0);
+    c.fillRect(cx2 + s*1.1,  yOff + s*3.8, s*0.9, s*3.0);
+
+    // Hands
+    c.fillStyle = '#c8a060';
+    c.fillRect(cx2 - s*2.0, yOff + s*6.6, s*0.9, s*0.8);
+    c.fillRect(cx2 + s*1.1,  yOff + s*6.6, s*0.9, s*0.8);
+
+    // Neck
+    c.fillStyle = '#c8a060';
+    c.fillRect(cx2 - s*0.4, yOff + s*2.6, s*0.8, s*1.2);
+
+    // Head
+    c.fillStyle = '#e8c89a';
+    c.fillRect(cx2 - s*1.2, yOff + s*0.8, s*2.4, s*2.2);
+
+    // Helmet
+    c.fillStyle = '#1a1a2e';
+    c.fillRect(cx2 - s*1.3, yOff, s*2.6, s*1.4);
+    // Helmet top horn
+    c.fillStyle = '#e63946';
+    c.beginPath();
+    c.moveTo(cx2 - s*0.3, yOff - s*1.1); c.lineTo(cx2 - s*0.6, yOff); c.lineTo(cx2, yOff); c.fill();
+    c.beginPath();
+    c.moveTo(cx2 + s*0.3, yOff - s*0.8); c.lineTo(cx2, yOff); c.lineTo(cx2 + s*0.6, yOff); c.fill();
+    // Helmet face guard
+    c.fillStyle = '#0f0f1e';
+    c.fillRect(cx2 - s*1.3, yOff + s*1.0, s*2.6, s*1.0);
+    // Glowing eyes
+    c.fillStyle = '#ff0000';
+    c.shadowColor = '#ff0000'; c.shadowBlur = 10;
+    c.fillRect(cx2 - s*0.85, yOff + s*1.25, s*0.5, s*0.45);
+    c.fillRect(cx2 + s*0.35,  yOff + s*1.25, s*0.5, s*0.45);
+    c.shadowBlur = 0;
+
+    // Katana (held diagonally)
+    c.strokeStyle = '#c8c8c8'; c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(cx2 + s*1.9, yOff + s*1.5); c.lineTo(cx2 - s*0.2, yOff + s*7.8);
+    c.stroke();
+    c.strokeStyle = '#8b4513'; c.lineWidth = 5;
+    c.beginPath();
+    c.moveTo(cx2 + s*1.1, yOff + s*5.6); c.lineTo(cx2 + s*1.9, yOff + s*3.8);
+    c.stroke();
+    // Guard
+    c.fillStyle = '#ffd700';
+    c.fillRect(cx2 + s*0.8, yOff + s*5.4, s*1.2, s*0.4);
+}
+
+/* ── Rank helper ── */
+function getRank(total) {
+    if (total >= 60000) return { name: 'MASTER',    nameAr: 'أستاذ',      color: '#ffd700' };
+    if (total >= 30000) return { name: 'SAMURAI',   nameAr: 'ساموراي',    color: '#ff8c00' };
+    if (total >= 10000) return { name: 'SHINOBI',   nameAr: 'شينوبي',     color: '#e63946' };
+    if (total >= 3000)  return { name: 'APPRENTICE',nameAr: 'متدرب',      color: '#00c896' };
+    return                     { name: 'RONIN',     nameAr: 'رونين',       color: 'rgba(255,255,255,0.4)' };
+}
+
+/* ── Load and render ── */
+function loadProfile() {
+    var isAr   = localStorage.getItem('samurai_lang') === 'ar';
+    var total  = parseInt(localStorage.getItem('samurai_total_accumulated') || 0);
+    var played = parseInt(localStorage.getItem('samurai_games_played') || 0);
+    var duel   = parseInt(localStorage.getItem('best_duel')   || 0);
+    var sensei2= parseInt(localStorage.getItem('best_sensei') || 0);
+    var puzzle = parseInt(localStorage.getItem('best_puzzle') || 0);
+    var arena  = parseInt(localStorage.getItem('best_arena')  || 0);
+    var pct    = Math.min(100, Math.round(total / 60000 * 100));
+
+    var maxScore = 2000; // for bar scaling
+
+    // Avatar
+    drawAvatar(document.getElementById('avatarCanvas'));
+
+    // Rank
+    var rank = getRank(total);
+    var rankEl = document.getElementById('profile-rank');
+    if (rankEl) {
+        rankEl.textContent = '⚔ RANK: ' + (isAr ? rank.nameAr : rank.name);
+        rankEl.style.color = rank.color;
+    }
+
+    // XP bar
+    var xpFill = document.getElementById('xp-fill');
+    var xpLabel = document.getElementById('xp-label');
+    if (xpFill) setTimeout(function() { xpFill.style.width = pct + '%'; }, 200);
+    if (xpLabel) {
+        xpLabel.textContent = isAr
+            ? total.toLocaleString() + ' / 60,000 نقطة نحو المرتبة الأعلى'
+            : total.toLocaleString() + ' / 60,000 XP TO MASTER RANK';
+    }
+
+    // Stats
+    var allBests = [duel, sensei2, puzzle, arena];
+    var singleBest = Math.max.apply(null, allBests);
+    document.getElementById('s-total').textContent  = total.toLocaleString();
+    document.getElementById('s-played').textContent = played;
+    document.getElementById('s-best').textContent   = singleBest.toLocaleString();
+
+    // Score bars
+    var scoreBarMax = Math.max(singleBest, 100);
+    [['duel',duel],['sensei',sensei2],['puzzle',puzzle],['arena',arena]].forEach(function(g) {
+        var bar = document.getElementById('bar-' + g[0]);
+        var num = document.getElementById('num-' + g[0]);
+        if (bar) setTimeout(function() { bar.style.width = Math.min(100,(g[1]/scoreBarMax*100)) + '%'; }, 300);
+        if (num) num.textContent = g[1].toLocaleString();
+    });
+
+    // Reward banner
+    var rewardPct = document.getElementById('reward-pct');
+    var rewardFill = document.getElementById('reward-bar-fill');
+    var rewardIcon = document.getElementById('reward-icon');
+    var rewardTitle = document.getElementById('reward-title');
+    var rewardDesc  = document.getElementById('reward-desc');
+    if (rewardPct)  rewardPct.textContent = pct + '%';
+    if (rewardFill) setTimeout(function() { rewardFill.style.width = pct + '%'; }, 250);
+    if (total >= 60000 && rewardIcon) {
+        rewardIcon.textContent = '🎟';
+        if (rewardTitle) rewardTitle.textContent = isAr ? '✓ مبروك! كوبون 25% مفتوح' : '✓ UNLOCKED! YOUR 25% COUPON: SAMURAI25';
+        if (rewardDesc)  rewardDesc.textContent  = isAr
+            ? 'أدخل الكود SAMURAI25 عند الدفع في المتجر'
+            : 'Enter code SAMURAI25 at checkout in the store';
+    }
+
+    // Achievements
+    var data = { total:total, played:played, duel:duel, sensei:sensei2, puzzle:puzzle, arena:arena };
+    var unlocked = 0;
+    var grid = document.getElementById('achievements-grid');
+    if (grid) {
+        grid.innerHTML = '';
+        ACHIEVEMENTS.forEach(function(a) {
+            var isUnlocked = a.check(data);
+            if (isUnlocked) unlocked++;
+            var div = document.createElement('div');
+            div.className = 'achievement ' + (isUnlocked ? 'unlocked' : 'locked');
+            div.innerHTML =
+                '<div class="ach-icon">' + a.icon + '</div>' +
+                '<div class="ach-body">' +
+                  '<div class="ach-name">' + (isAr ? a.nameAr : a.name) + '</div>' +
+                  '<div class="ach-desc">' + (isAr ? a.descAr  : a.desc) + '</div>' +
+                '</div>' +
+                (isUnlocked ? '<div class="ach-check">✓</div>' : '');
+            grid.appendChild(div);
+        });
+    }
+    document.getElementById('s-unlocked').textContent = unlocked + '/7';
+
+    // Profile badges
+    var badgesEl = document.getElementById('profile-badges');
+    if (badgesEl) {
+        badgesEl.innerHTML = '';
+        var badges = [];
+        if (played >= 1)    badges.push({ label: isAr ? 'لاعب' : 'PLAYER',    cls: 'red' });
+        if (total >= 1000)  badges.push({ label: isAr ? 'نشيط' : 'ACTIVE',    cls: 'gold' });
+        if (duel >= 100)    badges.push({ label: isAr ? 'مقاتل' : 'FIGHTER',  cls: 'red' });
+        if (sensei2 >= 100) badges.push({ label: isAr ? 'حارس' : 'GUARD',     cls: 'gold' });
+        if (unlocked >= 5)  badges.push({ label: isAr ? 'بطل' : 'HERO',       cls: 'green' });
+        if (total >= 60000) badges.push({ label: isAr ? 'أستاذ' : 'MASTER',   cls: 'gold' });
+        if (badges.length === 0) badges.push({ label: isAr ? 'مبتدئ' : 'NOVICE', cls: 'grey' });
+        badges.forEach(function(b) {
+            var span = document.createElement('span');
+            span.className = 'badge-pill ' + b.cls;
+            span.textContent = b.label;
+            badgesEl.appendChild(span);
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadProfile();
+});
+
+// Refresh when localStorage changes (e.g. user played a game in another tab)
+window.addEventListener('storage', loadProfile);
+    </script>
+</body>
+</html>
